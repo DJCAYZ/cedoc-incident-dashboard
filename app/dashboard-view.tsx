@@ -219,15 +219,6 @@ export function DashboardView() {
                             </div>
                             <div className="flex justify-between items-center bg-slate-700/50 p-3 rounded-lg">
                                 <span className="flex items-center gap-2">
-                                    <LifeBuoy size={18} className="text-blue-400" />
-                                    <span>Rescue Boats</span>
-                                </span>
-                                <span className="font-mono text-xl text-slate-400">
-                                    {resources.rescue_boats_active}/{resources.rescue_boats_total}
-                                </span>
-                            </div>
-                            <div className="flex justify-between items-center bg-slate-700/50 p-3 rounded-lg">
-                                <span className="flex items-center gap-2">
                                     <Shield size={18} className="text-purple-400" />
                                     <span>Personnel</span>
                                 </span>
@@ -241,11 +232,8 @@ export function DashboardView() {
                     <div className="bg-slate-800/80 p-6 rounded-2xl border border-slate-600 shadow-xl flex-1">
                         <h2 className="text-2xl font-bold mb-4 uppercase tracking-wider text-slate-300 border-b border-slate-600 pb-2">Emergency Contacts</h2>
                         <div className="space-y-3">
-                            <div><p className="text-sm text-slate-400">Incident Commander</p><p className="font-bold">0917-123-4567</p></div>
-                            <div><p className="text-sm text-slate-400">EOC Manager</p><p className="font-bold">0918-987-6543</p></div>
-                            <div><p className="text-sm text-slate-400">BFP San Juan</p><p className="font-bold">(02) 8725-8044</p></div>
-                            <div><p className="text-sm text-slate-400">PNP San Juan</p><p className="font-bold">(02) 8724-2515</p></div>
                             <div><p className="text-sm text-slate-400">CDRRMO / EMS</p><p className="font-bold">137-135</p></div>
+                            <div><p className="text-sm text-slate-400">Local</p><p className="font-bold">160-165</p></div>
                         </div>
                     </div>
                 </div>

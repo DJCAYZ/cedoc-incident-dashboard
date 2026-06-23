@@ -41,6 +41,15 @@ const barangays = [
     { name: "West Crame", district: 2 }
 ];
 
+const corazonDeJesusStreets = [
+    "A. Lake Street", "Attorney A. Mendoza Street", "Benavidez Street",
+    "Callejon Victoria", "Captain Manzano Street", "Corazon de Jesus Street",
+    "F. Roman Street", "H. Lozada Street", "J. Ruiz Street",
+    "Lactao Street", "Lope K. Santos Street", "N. Domingo Street",
+    "P. Grande Street", "Pancho Villa Street", "Paraiso Street", "Pinaglabanan Street",
+    "R. Lagmay Street", "S. Guzman Street"
+];
+
 export function IncidentForm() {
     const [name, setName] = useState("");
     const [location, setLocation] = useState("");
@@ -48,6 +57,7 @@ export function IncidentForm() {
     const [severity, setSeverity] = useState(severities[3]);
     const [status, setStatus] = useState(statuses[0]);
     const [barangay, setBarangay] = useState("");
+    const [street, setStreet] = useState("");
     const [isBarangayFocused, setIsBarangayFocused] = useState(false);
     const [respondingUnit, setRespondingUnit] = useState(respondingUnits[0]);
     const [casualtiesDead, setCasualtiesDead] = useState(0);
@@ -95,7 +105,7 @@ export function IncidentForm() {
         
         const incidentData: InsertIncident = {
             name,
-            location,
+            location: street ? `${street}, ${location}` : location,
             type,
             severity,
             status,
@@ -118,6 +128,7 @@ export function IncidentForm() {
         setSeverity(severities[3]);
         setStatus(statuses[0]);
         setBarangay("");
+        setStreet("");
         setRespondingUnit(respondingUnits[0]);
         setCasualtiesDead(0);
         setCasualtiesInjured(0);
@@ -169,6 +180,16 @@ export function IncidentForm() {
                     <label className="text-sm font-medium text-slate-700">Location Details</label>
                     <input type="text" required value={location} onChange={(e) => setLocation(e.target.value)} className="border border-slate-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500" placeholder="e.g., Near Main Stage" />
                 </div>
+
+                {barangay === "Corazon de Jesus" && (
+                    <div className="flex flex-col gap-2 col-span-2 md:col-span-1">
+                        <label className="text-sm font-medium text-slate-700">Street (Corazon de Jesus)</label>
+                        <select value={street} onChange={(e) => setStreet(e.target.value)} className="border border-slate-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500">
+                            <option value="">Select a street...</option>
+                            {corazonDeJesusStreets.map(s => <option key={s} value={s}>{s}</option>)}
+                        </select>
+                    </div>
+                )}
                 
                 <div className="flex flex-col gap-2 col-span-2 md:col-span-1 relative">
                     <label className="text-sm font-medium text-slate-700">Barangay</label>

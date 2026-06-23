@@ -80,17 +80,6 @@ export function ResourceForm({ initialData }: { initialData: ResourceMetrics }) 
 
                 <div className="flex flex-col gap-1.5">
                     <label className="font-semibold text-slate-700 flex items-center gap-1.5">
-                        <LifeBuoy size={14} className="text-blue-600" />
-                        <span>Rescue Boats (Active / Total)</span>
-                    </label>
-                    <div className="flex gap-2">
-                        <input type="number" min="0" required value={rescueBoatsActive} onChange={e => setRescueBoatsActive(Number(e.target.value))} className="border border-slate-300 rounded-md p-2 w-1/2 focus:ring-2 focus:ring-blue-500 text-sm" />
-                        <input type="number" min="0" required value={rescueBoatsTotal} onChange={e => setRescueBoatsTotal(Number(e.target.value))} className="border border-slate-300 rounded-md p-2 w-1/2 focus:ring-2 focus:ring-blue-500 text-sm" />
-                    </div>
-                </div>
-
-                <div className="flex flex-col gap-1.5">
-                    <label className="font-semibold text-slate-700 flex items-center gap-1.5">
                         <Shield size={14} className="text-purple-600" />
                         <span>Personnel Deployed</span>
                     </label>
