@@ -15,8 +15,11 @@ export default function Home() {
         </div>
 
       </div>
-      <div className="bg-white/90 shadow-md rounded-md h-[86vh] p-4 overflow-hidden">
+      <div className="h-[86vh] overflow-hidden flex gap-2 w-full">
         <IncidentDisplayList />
+        <div className='flex-1 bg-white/90 shadow-md rounded-md p-4'>
+          <p>List of resolved cases here</p>
+        </div>
       </div>
     </div>
   );
