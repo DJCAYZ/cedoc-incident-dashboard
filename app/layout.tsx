@@ -37,11 +37,7 @@ export default function RootLayout({
       className={cn("h-full ", "antialiased", geistSans.variable, geistMono.variable, "font-sans", inter.variable)}
       
     >
-      <body className="min-h-full flex flex-col bg-cover bg-bottom" style={{ backgroundImage: `url(${bgImage.src})` }}>
-        <div className="w-full bg-red-900 px-8 py-2 shadow-md flex justify-between h-full">
-          <Link href="/"><h1 className="text-white font-bold tracking-wider">CEDOC</h1></Link>
-        </div>
-
+      <body className="min-h-full flex flex-col bg-cover bg-bottom bg-fixed" style={{ backgroundImage: `url(${bgImage.src})` }}>
         <Providers>
           {children}
         </Providers>
