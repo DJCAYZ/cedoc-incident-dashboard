@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createIncident, InsertIncident } from "../actions";
 import { Button } from "@/components/ui/button";
 
 const incidentTypes = [
-    "Medical Case", "Heat Exhaustion", "Slips and Falls", 
-    "Road Traffic Accidents", "Missing Persons", "Lost Children", 
-    "Fire Incidents", "Public Disturbance", "Electrical Hazards", 
+    "Medical Case", "Trauma", "Heat Exhaustion", "Slips and Falls",
+    "Road Traffic Accidents", "Missing Persons", "Lost Children",
+    "Fire Incidents", "Public Disturbance", "Electrical Hazards",
     "Water-related Injuries", "Other"
 ];
 
@@ -65,7 +65,7 @@ export function IncidentForm() {
     const [casualtiesMissing, setCasualtiesMissing] = useState(0);
     const [evacuatedFamilies, setEvacuatedFamilies] = useState(0);
     const [evacuatedIndividuals, setEvacuatedIndividuals] = useState(0);
-    
+
     const getCurrentDatetimeLocal = () => {
         const now = new Date();
         now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
@@ -73,9 +73,19 @@ export function IncidentForm() {
     };
 
     const [datetime, setDatetime] = useState(getCurrentDatetimeLocal());
+    const [isDatetimeEdited, setIsDatetimeEdited] = useState(false);
+
+    useEffect(() => {
+        if (!isDatetimeEdited) {
+            const interval = setInterval(() => {
+                setDatetime(getCurrentDatetimeLocal());
+            }, 1000);
+            return () => clearInterval(interval);
+        }
+    }, [isDatetimeEdited]);
 
     // Filter barangays by typed value
-    const filteredBarangays = barangays.filter(b => 
+    const filteredBarangays = barangays.filter(b =>
         b.name.toLowerCase().includes(barangay.toLowerCase())
     );
 
@@ -102,7 +112,7 @@ export function IncidentForm() {
         }
 
         const timestamp = new Date(datetime).getTime();
-        
+
         const incidentData: InsertIncident = {
             name,
             location: street ? `${street}, ${location}` : location,
@@ -120,7 +130,7 @@ export function IncidentForm() {
         };
 
         await createIncident(incidentData);
-        
+
         // Reset form
         setName("");
         setLocation("");
@@ -136,25 +146,26 @@ export function IncidentForm() {
         setEvacuatedFamilies(0);
         setEvacuatedIndividuals(0);
         setDatetime(getCurrentDatetimeLocal());
+        setIsDatetimeEdited(false);
     };
 
     return (
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 bg-white/95 p-6 rounded-lg shadow-lg border border-slate-200 h-[70vh] overflow-y-auto">
             <h2 className="text-xl font-bold text-slate-800 sticky top-0 bg-white pb-2 z-10 border-b">Log New Incident</h2>
-            
+
             <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col gap-2 col-span-2">
                     <label className="text-sm font-medium text-slate-700">Incident Name/Title</label>
                     <input type="text" required value={name} onChange={(e) => setName(e.target.value)} className="border border-slate-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500" placeholder="e.g., Medical Emergency at Stage" />
                 </div>
-                
+
                 <div className="flex flex-col gap-2">
                     <label className="text-sm font-medium text-slate-700">Incident Type</label>
                     <select value={type} onChange={(e) => setType(e.target.value)} className="border border-slate-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500">
                         {incidentTypes.map(t => <option key={t} value={t}>{t}</option>)}
                     </select>
                 </div>
-                
+
                 <div className="flex flex-col gap-2">
                     <label className="text-sm font-medium text-slate-700">Severity</label>
                     <select value={severity} onChange={(e) => setSeverity(e.target.value)} className="border border-slate-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500">
@@ -168,7 +179,7 @@ export function IncidentForm() {
                         {statuses.map(s => <option key={s} value={s}>{s}</option>)}
                     </select>
                 </div>
-                
+
                 <div className="flex flex-col gap-2">
                     <label className="text-sm font-medium text-slate-700">Responding Unit</label>
                     <select value={respondingUnit} onChange={(e) => setRespondingUnit(e.target.value)} className="border border-slate-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500">
@@ -190,22 +201,21 @@ export function IncidentForm() {
                         </select>
                     </div>
                 )}
-                
+
                 <div className="flex flex-col gap-2 col-span-2 md:col-span-1 relative">
                     <label className="text-sm font-medium text-slate-700">Barangay</label>
-                    <input 
-                        type="text" 
-                        required 
-                        value={barangay} 
-                        onChange={(e) => setBarangay(e.target.value)} 
+                    <input
+                        type="text"
+                        required
+                        value={barangay}
+                        onChange={(e) => setBarangay(e.target.value)}
                         onFocus={() => setIsBarangayFocused(true)}
                         onBlur={handleBarangayBlur}
-                        className={`border rounded-md p-2 focus:ring-2 focus:ring-blue-500 w-full transition-colors ${
-                            !isValidBarangay ? "border-red-500 bg-red-50/50" : "border-slate-300"
-                        }`} 
-                        placeholder="Type to search barangay..." 
+                        className={`border rounded-md p-2 focus:ring-2 focus:ring-blue-500 w-full transition-colors ${!isValidBarangay ? "border-red-500 bg-red-50/50" : "border-slate-300"
+                            }`}
+                        placeholder="Type to search barangay..."
                     />
-                    
+
                     {isBarangayFocused && (
                         <div className="absolute z-50 left-0 right-0 top-[calc(100%+4px)] max-h-48 overflow-y-auto bg-white border border-slate-200 rounded-md shadow-lg py-1">
                             {[1, 2].map(districtNum => {
@@ -242,13 +252,13 @@ export function IncidentForm() {
 
                 <div className="flex flex-col gap-2">
                     <label className="text-sm font-medium text-slate-700">Date & Time</label>
-                    <input type="datetime-local" required value={datetime} onChange={(e) => setDatetime(e.target.value)} className="border border-slate-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500" />
+                    <input type="datetime-local" required value={datetime} onChange={(e) => { setDatetime(e.target.value); setIsDatetimeEdited(true); }} className="border border-slate-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500" />
                 </div>
             </div>
 
             <hr className="my-2" />
             <h3 className="text-md font-semibold text-slate-800">Casualties & Evacuations</h3>
-            
+
             <div className="grid grid-cols-3 gap-4">
                 <div className="flex flex-col gap-2">
                     <label className="text-xs font-medium text-slate-700">Dead</label>

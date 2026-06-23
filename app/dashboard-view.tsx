@@ -3,24 +3,24 @@
 import { useQuery } from "@tanstack/react-query";
 import { getIncidents, getResources } from "./actions";
 import { RealTimeClock } from "./real-time-clock";
-import { 
-    Ambulance, 
-    Flame, 
-    LifeBuoy, 
-    Shield, 
-    AlertCircle, 
-    AlertTriangle, 
-    CheckCircle, 
-    Info 
+import {
+    Ambulance,
+    Flame,
+    LifeBuoy,
+    Shield,
+    AlertCircle,
+    AlertTriangle,
+    CheckCircle,
+    Info
 } from "lucide-react";
 
 export function SeverityBadge({ severity }: { severity: string }) {
     // Strips emojis from beginning if present (e.g. "🔴 Critical" -> "Critical")
     const cleanSeverity = severity.replace(/^[^\w]*/, "").trim();
-    
+
     let color = "bg-slate-700/50 text-slate-300 border-slate-600";
     let Icon = Info;
-    
+
     if (severity.includes("Critical")) {
         color = "bg-red-500/10 text-red-400 border-red-500/30";
         Icon = AlertCircle;
@@ -34,7 +34,7 @@ export function SeverityBadge({ severity }: { severity: string }) {
         color = "bg-green-500/10 text-green-400 border-green-500/30";
         Icon = CheckCircle;
     }
-    
+
     return (
         <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold border ${color}`}>
             <Icon size={12} className="shrink-0" />
@@ -44,10 +44,10 @@ export function SeverityBadge({ severity }: { severity: string }) {
 }
 
 export function DashboardView() {
-    const { data: incidents = [] } = useQuery({ 
-        queryKey: ['incidents', 'all'], 
-        queryFn: getIncidents, 
-        refetchInterval: 1000 
+    const { data: incidents = [] } = useQuery({
+        queryKey: ['incidents', 'all'],
+        queryFn: getIncidents,
+        refetchInterval: 1000
     });
 
     const { data: resources = {
@@ -68,15 +68,10 @@ export function DashboardView() {
     const totalIncidents = incidents.length;
     const activeIncidents = incidents.filter(i => i.status !== 'Closed');
     const resolvedIncidents = incidents.filter(i => i.status === 'Closed');
-    
-    const casualtiesDead = incidents.reduce((sum, i) => sum + i.casualties_dead, 0);
-    const casualtiesInjured = incidents.reduce((sum, i) => sum + i.casualties_injured, 0);
-    const casualtiesMissing = incidents.reduce((sum, i) => sum + i.casualties_missing, 0);
-    
-    const evacuatedFamilies = incidents.reduce((sum, i) => sum + i.evacuated_families, 0);
-    const evacuatedIndividuals = incidents.reduce((sum, i) => sum + i.evacuated_individuals, 0);
-    
-    const affectedBarangays = new Set(incidents.map(i => i.barangay)).size;
+
+    const traumaCases = incidents.filter(i => ['Trauma', 'Slips and Falls', 'Road Traffic Accidents', 'Water-related Injuries'].includes(i.type)).length;
+    const medicalCases = incidents.filter(i => ['Medical Case', 'Heat Exhaustion'].includes(i.type)).length;
+    const otherCases = incidents.filter(i => !['Slips and Falls', 'Road Traffic Accidents', 'Water-related Injuries', 'Medical Case', 'Heat Exhaustion'].includes(i.type)).length;
 
     // Breakdown by Type
     const typeCount: Record<string, number> = {};
@@ -92,7 +87,7 @@ export function DashboardView() {
 
     return (
         <div className="flex flex-col gap-8 h-full overflow-hidden text-white">
-            
+
             {/* Top Cards (Summary) */}
             <div className="grid grid-cols-6 gap-6">
                 <div className="bg-slate-800/80 p-6 rounded-2xl border border-slate-600 shadow-xl flex flex-col items-center justify-center">
@@ -108,27 +103,27 @@ export function DashboardView() {
                     <span className="text-xl uppercase tracking-widest text-green-200 mt-2">Resolved</span>
                 </div>
                 <div className="bg-slate-800/80 p-6 rounded-2xl border border-red-500/50 shadow-xl flex flex-col items-center justify-center text-center">
-                    <span className="text-4xl font-black text-red-400">{casualtiesDead} / {casualtiesInjured} / {casualtiesMissing}</span>
-                    <span className="text-sm uppercase tracking-widest text-red-200 mt-2">Dead / Inj / Miss</span>
+                    <span className="text-6xl font-black text-red-400">{traumaCases}</span>
+                    <span className="text-sm uppercase tracking-widest text-red-200 mt-2">Trauma (Injury)</span>
                 </div>
                 <div className="bg-slate-800/80 p-6 rounded-2xl border border-orange-500/50 shadow-xl flex flex-col items-center justify-center text-center">
-                    <span className="text-4xl font-black text-orange-400">{evacuatedFamilies} / {evacuatedIndividuals}</span>
-                    <span className="text-sm uppercase tracking-widest text-orange-200 mt-2">Evac Fam / Ind</span>
+                    <span className="text-6xl font-black text-orange-400">{medicalCases}</span>
+                    <span className="text-sm uppercase tracking-widest text-orange-200 mt-2">Medical Cases</span>
                 </div>
                 <div className="bg-slate-800/80 p-6 rounded-2xl border border-purple-500/50 shadow-xl flex flex-col items-center justify-center text-center">
-                    <span className="text-6xl font-black text-purple-400">{affectedBarangays}</span>
-                    <span className="text-sm uppercase tracking-widest text-purple-200 mt-2">Affected Brgys</span>
+                    <span className="text-6xl font-black text-purple-400">{otherCases}</span>
+                    <span className="text-sm uppercase tracking-widest text-purple-200 mt-2">Other Cases</span>
                 </div>
             </div>
 
             <div className="grid grid-cols-4 gap-6 flex-1 overflow-hidden">
-                
+
                 {/* Left Column: Breakdown & Status */}
                 <div className="col-span-1 flex flex-col gap-6">
                     <div className="bg-slate-800/80 p-6 rounded-2xl border border-slate-600 shadow-xl flex-1 flex flex-col">
                         <h2 className="text-2xl font-bold mb-4 uppercase tracking-wider text-slate-300 border-b border-slate-600 pb-2">Incident Types</h2>
                         <div className="flex-1 overflow-y-auto space-y-3 pr-2">
-                            {Object.entries(typeCount).sort((a,b) => b[1] - a[1]).map(([type, count]) => (
+                            {Object.entries(typeCount).sort((a, b) => b[1] - a[1]).map(([type, count]) => (
                                 <div key={type} className="flex flex-col">
                                     <div className="flex justify-between text-sm mb-1">
                                         <span>{type}</span>
@@ -231,9 +226,15 @@ export function DashboardView() {
 
                     <div className="bg-slate-800/80 p-6 rounded-2xl border border-slate-600 shadow-xl flex-1">
                         <h2 className="text-2xl font-bold mb-4 uppercase tracking-wider text-slate-300 border-b border-slate-600 pb-2">Emergency Contacts</h2>
-                        <div className="space-y-3">
-                            <div><p className="text-sm text-slate-400">CDRRMO / EMS</p><p className="font-bold">137-135</p></div>
-                            <div><p className="text-sm text-slate-400">Local</p><p className="font-bold">160-165</p></div>
+                        <div className="space-y-6">
+                            <div>
+                                <p className="text-4xl font-bold text-slate-400 mb-1">CDRRMO / EMS</p>
+                                <p className="text-8xl font-black text-white tracking-tighter">137-135</p>
+                            </div>
+                            <div>
+                                <p className="text-4xl font-bold text-slate-400 mb-1">Local</p>
+                                <p className="text-8xl font-black text-white tracking-tighter">160-165</p>
+                            </div>
                         </div>
                     </div>
                 </div>
