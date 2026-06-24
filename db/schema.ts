@@ -14,6 +14,7 @@ export const incidentsTable = sqliteTable("incidents", {
   casualties_missing: int().notNull().default(0),
   evacuated_families: int().notNull().default(0),
   evacuated_individuals: int().notNull().default(0),
+  details: text().notNull().default(""),
   created_at: int().notNull(),
   resolved_at: int(),
 });

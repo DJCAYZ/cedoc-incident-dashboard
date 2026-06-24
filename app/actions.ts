@@ -8,6 +8,7 @@ import { revalidatePath } from 'next/cache';
 const db = drizzle(process.env.DB_FILE_NAME!);
 
 export type InsertIncident = typeof incidentsTable.$inferInsert;
+export type Incident = typeof incidentsTable.$inferSelect;
 export type ResourceMetrics = typeof resourcesTable.$inferSelect;
 
 export async function getIncidents() {
@@ -33,6 +34,12 @@ export async function resolveIncident(id: number) {
         status: 'Closed',
         resolved_at: Date.now()
     }).where(eq(incidentsTable.id, id));
+    revalidatePath('/');
+    revalidatePath('/admin');
+}
+
+export async function updateIncident(id: number, data: Partial<InsertIncident>) {
+    await db.update(incidentsTable).set(data).where(eq(incidentsTable.id, id));
     revalidatePath('/');
     revalidatePath('/admin');
 }

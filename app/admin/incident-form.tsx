@@ -65,6 +65,7 @@ export function IncidentForm() {
     const [casualtiesMissing, setCasualtiesMissing] = useState(0);
     const [evacuatedFamilies, setEvacuatedFamilies] = useState(0);
     const [evacuatedIndividuals, setEvacuatedIndividuals] = useState(0);
+    const [details, setDetails] = useState("");
 
     const getCurrentDatetimeLocal = () => {
         const now = new Date();
@@ -126,6 +127,7 @@ export function IncidentForm() {
             casualties_missing: casualtiesMissing,
             evacuated_families: evacuatedFamilies,
             evacuated_individuals: evacuatedIndividuals,
+            details: details,
             created_at: timestamp
         };
 
@@ -145,6 +147,7 @@ export function IncidentForm() {
         setCasualtiesMissing(0);
         setEvacuatedFamilies(0);
         setEvacuatedIndividuals(0);
+        setDetails("");
         setDatetime(getCurrentDatetimeLocal());
         setIsDatetimeEdited(false);
     };
@@ -253,6 +256,11 @@ export function IncidentForm() {
                 <div className="flex flex-col gap-2">
                     <label className="text-sm font-medium text-slate-700">Date & Time</label>
                     <input type="datetime-local" required value={datetime} onChange={(e) => { setDatetime(e.target.value); setIsDatetimeEdited(true); }} className="border border-slate-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500" />
+                </div>
+
+                <div className="flex flex-col gap-2 col-span-2">
+                    <label className="text-sm font-medium text-slate-700">Additional Details / Log</label>
+                    <textarea value={details} onChange={(e) => setDetails(e.target.value)} rows={3} className="border border-slate-300 rounded-md p-2 focus:ring-2 focus:ring-blue-500" placeholder="Enter any additional details or logs..." />
                 </div>
             </div>
 

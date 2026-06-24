@@ -1,6 +1,7 @@
-import { getActiveIncidents, resolveIncident, getResources } from "../actions";
+import { getActiveIncidents, resolveIncident, getResources, getResolvedIncidents } from "../actions";
 import { IncidentForm } from "./incident-form";
 import { ResourceForm } from "./resource-form";
+import { IncidentList } from "./incident-list";
 import { SeverityBadge } from "../dashboard-view";
 import dayjs from "dayjs";
 import { Button } from "@/components/ui/button";
@@ -8,6 +9,7 @@ import Link from "next/link";
 
 export default async function AdminPage() {
     const activeIncidents = await getActiveIncidents();
+    const resolvedIncidents = await getResolvedIncidents();
     const resources = await getResources();
 
     return (
@@ -20,44 +22,29 @@ export default async function AdminPage() {
                 </div>
             </div>
 
-            <div className="p-8 max-w-5xl mx-auto space-y-8 w-full flex-1">
+            <div className="p-8 max-w-[95%] mx-auto space-y-8 w-full flex-1">
                 <div className="flex justify-between items-center bg-slate-900/90 backdrop-blur-md text-white p-4 rounded-lg shadow-md">
                     <h1 className="text-2xl font-bold tracking-tight">Operator Input Dashboard</h1>
                 </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div>
+            <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
+                {/* Left Section: Forms (Col Span 2) */}
+                <div className="xl:col-span-2 flex flex-col gap-6">
                     <IncidentForm />
+                    <ResourceForm initialData={resources} />
                 </div>
                 
-                <div className="flex flex-col gap-6 h-[70vh]">
-                    <ResourceForm initialData={resources} />
-                    
-                    <div className="bg-white/95 p-6 rounded-lg shadow-lg border border-slate-200 flex-1 overflow-y-auto">
-                        <h2 className="text-xl font-bold text-slate-800 mb-4">Active Incidents</h2>
-                        <div className="space-y-4">
-                            {activeIncidents.length === 0 && <p className="text-slate-500 text-sm">No active incidents.</p>}
-                            {activeIncidents.map((incident) => {
-                                const resolve = resolveIncident.bind(null, incident.id);
-                                return (
-                                    <div key={incident.id} className="border border-slate-200 bg-white rounded-md p-4 shadow-sm flex flex-col gap-2">
-                                        <div className="flex justify-between items-start">
-                                            <h3 className="font-semibold text-lg text-slate-900">{incident.name}</h3>
-                                            <span className="text-xs bg-slate-100 text-slate-800 border px-2 py-1 rounded-full font-medium">{incident.status}</span>
-                                        </div>
-                                        <div className="flex flex-wrap gap-2 items-center">
-                                            <span className="bg-blue-50 text-blue-700 px-2 py-1 rounded text-xs font-semibold">{incident.type}</span>
-                                            <SeverityBadge severity={incident.severity} />
-                                        </div>
-                                        <p className="text-sm text-slate-600"><strong>Location:</strong> {incident.location} ({incident.barangay})</p>
-                                        <p className="text-sm text-slate-600"><strong>Time:</strong> {dayjs(incident.created_at).format("MMM D, YYYY hh:mm A")}</p>
-                                        <form action={resolve}>
-                                            <Button type="submit" variant="outline" className="w-full mt-2 border-slate-300 hover:bg-slate-50 cursor-pointer">Close Incident</Button>
-                                        </form>
-                                    </div>
-                                );
-                            })}
-                        </div>
+                {/* Middle Section: Active Incidents (Col Span 1) */}
+                <div className="xl:col-span-1 flex flex-col h-[70vh]">
+                    <div className="flex flex-col flex-1 overflow-hidden">
+                        <IncidentList title="Active Incidents" incidents={activeIncidents} showCloseButton={true} />
+                    </div>
+                </div>
+
+                {/* Right Section: Resolved Incidents (Col Span 1) */}
+                <div className="xl:col-span-1 flex flex-col h-[70vh]">
+                    <div className="flex flex-col flex-1 overflow-hidden">
+                        <IncidentList title="Resolved Incidents" incidents={resolvedIncidents} showCloseButton={false} />
                     </div>
                 </div>
             </div>

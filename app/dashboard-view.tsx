@@ -163,7 +163,8 @@ export function DashboardView() {
                                         <th className="pb-3 pr-4">Incident</th>
                                         <th className="pb-3 pr-4">Severity</th>
                                         <th className="pb-3 pr-4">Status</th>
-                                        <th className="pb-3">Unit</th>
+                                        <th className="pb-3 pr-4">Unit</th>
+                                        <th className="pb-3">Details</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -180,7 +181,8 @@ export function DashboardView() {
                                                     {inc.status}
                                                 </span>
                                             </td>
-                                            <td className="py-3 text-slate-400">{inc.responding_unit}</td>
+                                            <td className="py-3 pr-4 text-slate-400">{inc.responding_unit}</td>
+                                            <td className="py-3 text-slate-400 text-sm max-w-[200px] truncate">{inc.details || "-"}</td>
                                         </tr>
                                     ))}
                                 </tbody>
