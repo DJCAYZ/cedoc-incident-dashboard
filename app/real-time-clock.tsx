@@ -15,6 +15,6 @@ export function RealTimeClock() {
     });
 
     return (
-        <p suppressHydrationWarning>{dayjs(time).format("HH:mm:ss")}</p>
+        <p suppressHydrationWarning>{dayjs(time).format("hh:mm:ss A")}</p>
     )
 }
