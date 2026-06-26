@@ -1,11 +1,11 @@
 "use server";
 
 import { incidentsTable, resourcesTable } from '@/db/schema';
-import { drizzle } from 'drizzle-orm/libsql';
+import { drizzle } from 'drizzle-orm/node-postgres';
 import { eq, desc, ne } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 
-const db = drizzle(process.env.DB_FILE_NAME!);
+const db = drizzle(process.env.DATABASE_URL!);
 
 export type InsertIncident = typeof incidentsTable.$inferInsert;
 export type Incident = typeof incidentsTable.$inferSelect;
@@ -32,7 +32,7 @@ export async function createIncident(data: InsertIncident) {
 export async function resolveIncident(id: number) {
     await db.update(incidentsTable).set({ 
         status: 'Closed',
-        resolved_at: Date.now()
+        resolved_at: new Date(),
     }).where(eq(incidentsTable.id, id));
     revalidatePath('/');
     revalidatePath('/admin');

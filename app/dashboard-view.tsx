@@ -47,7 +47,7 @@ export function DashboardView() {
     const { data: incidents = [] } = useQuery({
         queryKey: ['incidents', 'all'],
         queryFn: getIncidents,
-        refetchInterval: 1000
+        // refetchInterval: 1000
     });
 
     const { data: resources = {
@@ -61,7 +61,7 @@ export function DashboardView() {
     } } = useQuery({
         queryKey: ['resources', 'all'],
         queryFn: getResources,
-        refetchInterval: 1000
+        // refetchInterval: 1000
     });
 
     // Aggregations
