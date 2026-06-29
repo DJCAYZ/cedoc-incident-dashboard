@@ -36,8 +36,8 @@ export const barangaysTable = pgTable("barangays",{
 });
 
 export const streetsTable = pgTable("streets", {
-  name: t.varchar(),
-  barangay: t.varchar(),
+  name: t.varchar().notNull(),
+  barangay: t.varchar().notNull(),
 }, (table) => [
   primaryKey({ columns: [table.name, table.barangay] }),
 ]);
