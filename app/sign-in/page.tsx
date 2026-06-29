@@ -1,14 +1,18 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { authClient } from "@/lib/auth-client";
 import { email, z } from "zod";
+import { handleSubmit } from "./actions";
+import { redirect } from "next/navigation";
+import { useRouter } from "next/router";
 
 export default function SignInPage() {
-    const handleSubmit = async (formData: FormData) => {
-        "use server";
-
-        authClient.signIn.email({
-            email: formData.get("email") as string,
-            password: formData.get("password") as string,
+    const handleLogin = async (formData: FormData) => {
+        const result = await authClient.signIn.email({
+            email: formData.get('email') as string,
+            password: formData.get('password') as string,
+            callbackURL: '/admin',
         });
     }
 
@@ -17,7 +21,7 @@ export default function SignInPage() {
             <div className="bg-slate-900/80 backdrop-blur-md shadow-2xl rounded-3xl p-6 border-2 border-slate-700/50 flex flex-col justify-between items-center gap-8 shrink-0">
                 <p className="font-bold text-2xl text-white tracking-tight">Sign in</p>
 
-                <form action={handleSubmit} className="flex flex-col gap-2 p-6 w-full">
+                <form action={handleLogin} className="flex flex-col gap-2 p-6 w-full">
                     <div className="flex flex-col gap-2">
                         <label htmlFor="email" className="text-sm font-medium text-white">Email Address</label>
                         <input

@@ -6,6 +6,8 @@ import { SeverityBadge } from "../dashboard-view";
 import dayjs from "dayjs";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { authClient } from "@/lib/auth-client";
+import { SignOutButton } from "./sign-out-button";
 
 export default async function AdminPage() {
     const activeIncidents = await getActiveIncidents();
@@ -19,6 +21,7 @@ export default async function AdminPage() {
                 <Link href="/"><h1 className="text-white text-xl font-bold tracking-widest uppercase flex items-center gap-2"><span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>CEDOC</h1></Link>
                 <div className="flex gap-4">
                     <Link href="/" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">Live Feed</Link>
+                    <SignOutButton />
                 </div>
             </div>
 
