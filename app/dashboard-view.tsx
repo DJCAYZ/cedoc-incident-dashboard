@@ -11,7 +11,8 @@ import {
     AlertCircle,
     AlertTriangle,
     CheckCircle,
-    Info
+    Info,
+    Activity
 } from "lucide-react";
 
 export function SeverityBadge({ severity }: { severity: string }) {
@@ -43,10 +44,10 @@ export function SeverityBadge({ severity }: { severity: string }) {
     );
 }
 
-export function DashboardView() {
+export function DashboardView({ sessionId }: { sessionId: number }) {
     const { data: incidents = [] } = useQuery({
-        queryKey: ['incidents', 'all'],
-        queryFn: getIncidents,
+        queryKey: ['incidents', 'session', sessionId],
+        queryFn: () => getIncidents(sessionId),
         refetchInterval: 1000
     });
 
@@ -85,11 +86,27 @@ export function DashboardView() {
         statusCount[i.status] = (statusCount[i.status] || 0) + 1;
     });
 
+    // Barangay Heatmap
+    const barangayCount: Record<string, number> = {};
+    incidents.forEach(i => {
+        if (i.barangay !== 'Unknown') {
+            barangayCount[i.barangay] = (barangayCount[i.barangay] || 0) + 1;
+        }
+    });
+    const sortedBarangays = Object.entries(barangayCount).sort((a, b) => b[1] - a[1]);
+    const maxBarangayCount = sortedBarangays.length > 0 ? sortedBarangays[0][1] : 1;
+
+    // Casualties
+    const totalDead = incidents.reduce((sum, inc) => sum + inc.casualties_dead, 0);
+    const totalInjured = incidents.reduce((sum, inc) => sum + inc.casualties_injured, 0);
+    const totalMissing = incidents.reduce((sum, inc) => sum + inc.casualties_missing, 0);
+    const totalEvacuated = incidents.reduce((sum, inc) => sum + inc.evacuated_individuals, 0);
+
     return (
         <div className="flex flex-col gap-8 h-full overflow-hidden text-white">
 
             {/* Top Cards (Summary) */}
-            <div className="grid grid-cols-6 gap-6">
+            <div className="grid grid-cols-7 gap-6">
                 <div className="bg-slate-800/80 p-6 rounded-2xl border border-slate-600 shadow-xl flex flex-col items-center justify-center">
                     <span className="text-6xl font-black text-white">{totalIncidents}</span>
                     <span className="text-xl uppercase tracking-widest text-slate-400 mt-2">Total</span>
@@ -102,17 +119,19 @@ export function DashboardView() {
                     <span className="text-6xl font-black text-green-400">{resolvedIncidents.length}</span>
                     <span className="text-xl uppercase tracking-widest text-green-200 mt-2">Resolved</span>
                 </div>
-                <div className="bg-slate-800/80 p-6 rounded-2xl border border-red-500/50 shadow-xl flex flex-col items-center justify-center text-center">
-                    <span className="text-6xl font-black text-red-400">{traumaCases}</span>
-                    <span className="text-sm uppercase tracking-widest text-red-200 mt-2">Trauma (Injury)</span>
+
+                <div className="bg-slate-800/80 p-6 rounded-2xl border border-red-900/50 shadow-xl flex flex-col items-center justify-center text-center col-span-2">
+                    <div className="flex gap-8 mb-2">
+                        <div className="flex flex-col items-center"><span className="text-4xl font-black text-red-500">{totalDead}</span><span className="text-xs text-red-300 uppercase font-bold tracking-wider">Dead</span></div>
+                        <div className="flex flex-col items-center"><span className="text-4xl font-black text-orange-400">{totalInjured}</span><span className="text-xs text-orange-200 uppercase font-bold tracking-wider">Injured</span></div>
+                        <div className="flex flex-col items-center"><span className="text-4xl font-black text-yellow-500">{totalMissing}</span><span className="text-xs text-yellow-200 uppercase font-bold tracking-wider">Missing</span></div>
+                    </div>
+                    <span className="text-sm uppercase tracking-widest text-red-400 mt-2 border-t border-red-500/20 pt-2 w-full">Event Casualties</span>
                 </div>
-                <div className="bg-slate-800/80 p-6 rounded-2xl border border-orange-500/50 shadow-xl flex flex-col items-center justify-center text-center">
-                    <span className="text-6xl font-black text-orange-400">{medicalCases}</span>
-                    <span className="text-sm uppercase tracking-widest text-orange-200 mt-2">Medical Cases</span>
-                </div>
-                <div className="bg-slate-800/80 p-6 rounded-2xl border border-purple-500/50 shadow-xl flex flex-col items-center justify-center text-center">
-                    <span className="text-6xl font-black text-purple-400">{otherCases}</span>
-                    <span className="text-sm uppercase tracking-widest text-purple-200 mt-2">Other Cases</span>
+
+                <div className="bg-slate-800/80 p-6 rounded-2xl border border-cyan-900/50 shadow-xl flex flex-col items-center justify-center text-center col-span-2">
+                    <span className="text-6xl font-black text-cyan-400">{totalEvacuated}</span>
+                    <span className="text-sm uppercase tracking-widest text-cyan-500 mt-2 border-t border-cyan-500/20 pt-2 w-full">Individuals Evacuated</span>
                 </div>
             </div>
 
@@ -120,7 +139,7 @@ export function DashboardView() {
 
                 {/* Left Column: Breakdown & Status */}
                 <div className="col-span-1 flex flex-col gap-6">
-                    <div className="bg-slate-800/80 p-6 rounded-2xl border border-slate-600 shadow-xl flex-1 flex flex-col">
+                    <div className="bg-slate-800/80 p-6 rounded-2xl border border-slate-600 shadow-xl flex flex-col h-1/2">
                         <h2 className="text-2xl font-bold mb-4 uppercase tracking-wider text-slate-300 border-b border-slate-600 pb-2">Incident Types</h2>
                         <div className="flex-1 overflow-y-auto space-y-3 pr-2">
                             {Object.entries(typeCount).sort((a, b) => b[1] - a[1]).map(([type, count]) => (
@@ -137,15 +156,31 @@ export function DashboardView() {
                         </div>
                     </div>
 
-                    <div className="bg-slate-800/80 p-6 rounded-2xl border border-slate-600 shadow-xl">
-                        <h2 className="text-2xl font-bold mb-4 uppercase tracking-wider text-slate-300 border-b border-slate-600 pb-2">Status</h2>
-                        <div className="space-y-4">
-                            {['Reported', 'Validated', 'Response Ongoing', 'Monitoring', 'Closed'].map(st => (
-                                <div key={st} className="flex justify-between items-center text-lg">
-                                    <span>{st}</span>
-                                    <span className="font-bold bg-slate-700 px-3 py-1 rounded-md">{statusCount[st] || 0}</span>
-                                </div>
-                            ))}
+                    <div className="bg-slate-800/80 p-6 rounded-2xl border border-slate-600 shadow-xl flex flex-col h-1/2">
+                        <h2 className="text-2xl font-bold mb-4 uppercase tracking-wider text-slate-300 border-b border-slate-600 pb-2">Barangay Heatmap</h2>
+                        <div className="flex-1 overflow-y-auto space-y-2 pr-2">
+                            {sortedBarangays.map(([brgy, count]) => {
+                                const percentage = (count / maxBarangayCount) * 100;
+                                let colorClass = "bg-blue-500";
+                                if (percentage > 80) colorClass = "bg-red-500";
+                                else if (percentage > 50) colorClass = "bg-orange-500";
+                                else if (percentage > 25) colorClass = "bg-yellow-500";
+
+                                return (
+                                    <div key={brgy} className="flex flex-col bg-slate-700/30 p-2 rounded-lg">
+                                        <div className="flex justify-between text-sm mb-1">
+                                            <span className="font-medium text-slate-200">{brgy}</span>
+                                            <span className="font-bold text-white">{count}</span>
+                                        </div>
+                                        <div className="w-full bg-slate-700 rounded-full h-1.5">
+                                            <div className={`${colorClass} h-1.5 rounded-full`} style={{ width: `${percentage}%` }}></div>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                            {sortedBarangays.length === 0 && (
+                                <div className="text-slate-500 italic text-center py-4">No data yet</div>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -196,23 +231,33 @@ export function DashboardView() {
                     <div className="bg-slate-800/80 p-6 rounded-2xl border border-slate-600 shadow-xl">
                         <h2 className="text-2xl font-bold mb-4 uppercase tracking-wider text-slate-300 border-b border-slate-600 pb-2">Resource Monitoring</h2>
                         <div className="space-y-4">
-                            <div className="flex justify-between items-center bg-slate-700/50 p-3 rounded-lg">
-                                <span className="flex items-center gap-2">
-                                    <Ambulance size={18} className="text-green-400" />
-                                    <span>Ambulances</span>
-                                </span>
-                                <span className="font-mono text-xl text-green-400">
-                                    {resources.ambulances_active}/{resources.ambulances_total}
-                                </span>
+                            <div className="flex flex-col bg-slate-700/50 p-3 rounded-lg gap-1">
+                                <div className="flex justify-between items-center">
+                                    <span className="flex items-center gap-2">
+                                        <Ambulance size={18} className="text-green-400" />
+                                        <span>Ambulances</span>
+                                    </span>
+                                    <span className="font-mono text-xl text-green-400">
+                                        {resources.ambulances_active}/{resources.ambulances_total}
+                                    </span>
+                                </div>
+                                <div className="w-full bg-slate-800 rounded-full h-1.5 mt-1">
+                                    <div className="bg-green-500 h-1.5 rounded-full" style={{ width: `${(resources.ambulances_active / resources.ambulances_total) * 100}%` }}></div>
+                                </div>
                             </div>
-                            <div className="flex justify-between items-center bg-slate-700/50 p-3 rounded-lg">
-                                <span className="flex items-center gap-2">
-                                    <Flame size={18} className="text-yellow-400" />
-                                    <span>Fire Trucks</span>
-                                </span>
-                                <span className="font-mono text-xl text-yellow-400">
-                                    {resources.fire_trucks_active}/{resources.fire_trucks_total}
-                                </span>
+                            <div className="flex flex-col bg-slate-700/50 p-3 rounded-lg gap-1">
+                                <div className="flex justify-between items-center">
+                                    <span className="flex items-center gap-2">
+                                        <Flame size={18} className="text-yellow-400" />
+                                        <span>Fire Trucks</span>
+                                    </span>
+                                    <span className="font-mono text-xl text-yellow-400">
+                                        {resources.fire_trucks_active}/{resources.fire_trucks_total}
+                                    </span>
+                                </div>
+                                <div className="w-full bg-slate-800 rounded-full h-1.5 mt-1">
+                                    <div className="bg-yellow-500 h-1.5 rounded-full" style={{ width: `${(resources.fire_trucks_active / resources.fire_trucks_total) * 100}%` }}></div>
+                                </div>
                             </div>
                             <div className="flex justify-between items-center bg-slate-700/50 p-3 rounded-lg">
                                 <span className="flex items-center gap-2">

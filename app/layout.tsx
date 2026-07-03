@@ -21,7 +21,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "CEDOC Incident Dashboard",
-  description: "For San Juan Wattah Wattah Festival 2026",
+  description: "San Juan City Emergency Operations Center",
 };
 
 const queryClient = new QueryClient();

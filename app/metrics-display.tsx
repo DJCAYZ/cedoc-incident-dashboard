@@ -6,13 +6,13 @@ import { getActiveIncidents, getResolvedIncidents } from "./actions";
 export function MetricsDisplay() {
     const activeQuery = useQuery({ 
         queryKey: ['incidents', 'active'], 
-        queryFn: getActiveIncidents, 
+        queryFn: () => getActiveIncidents(), 
         refetchInterval: 1 * 1000 
     });
 
     const resolvedQuery = useQuery({ 
         queryKey: ['incidents', 'resolved'], 
-        queryFn: getResolvedIncidents, 
+        queryFn: () => getResolvedIncidents(), 
         refetchInterval: 1 * 1000 
     });
 

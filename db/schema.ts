@@ -1,7 +1,17 @@
 import { int, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 
+export const sessionsTable = sqliteTable("sessions", {
+  id: int().primaryKey({ autoIncrement: true }),
+  name: text().notNull(),
+  type: text().notNull().default('daily'),
+  status: text().notNull().default('active'),
+  started_at: int().notNull(),
+  closed_at: int(),
+});
+
 export const incidentsTable = sqliteTable("incidents", {
   id: int().primaryKey({ autoIncrement: true }),
+  session_id: int().references(() => sessionsTable.id),
   name: text().notNull(),
   type: text().notNull().default('Other'),
   severity: text().notNull().default('🟢 Normal'),
@@ -15,6 +25,8 @@ export const incidentsTable = sqliteTable("incidents", {
   evacuated_families: int().notNull().default(0),
   evacuated_individuals: int().notNull().default(0),
   details: text().notNull().default(""),
+  call_taker: text().notNull().default('Unknown'),
+  responder: text().notNull().default('Unknown'),
   created_at: int().notNull(),
   resolved_at: int(),
 });

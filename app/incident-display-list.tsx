@@ -7,7 +7,7 @@ import { getActiveIncidents, getResolvedIncidents } from "./actions";
 export function IncidentDisplayList({ status }: { status: 'active' | 'resolved' }) {
     const query = useQuery({ 
         queryKey: ['incidents', status], 
-        queryFn: status === 'active' ? getActiveIncidents : getResolvedIncidents, 
+        queryFn: () => status === 'active' ? getActiveIncidents() : getResolvedIncidents(), 
         refetchInterval: 1 * 1000 
     });
 
