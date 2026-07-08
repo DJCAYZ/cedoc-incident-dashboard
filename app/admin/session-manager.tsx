@@ -38,16 +38,16 @@ export function SessionManager({ activeSessions }: { activeSessions: Session[] }
                 </div>
 
                 <form onSubmit={handleCreate} className="flex w-full lg:w-auto items-center gap-3">
-                    <input 
-                        type="text" 
-                        value={eventName} 
-                        onChange={e => setEventName(e.target.value)} 
-                        placeholder="e.g. Typhoon Carina" 
+                    <input
+                        type="text"
+                        value={eventName}
+                        onChange={e => setEventName(e.target.value)}
+                        placeholder="e.g. Typhoon Carina"
                         className="flex-1 lg:w-64 bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-white placeholder-slate-500 text-sm focus:ring-2 focus:ring-blue-600 focus:border-blue-500 focus:outline-none transition-all"
                     />
-                    <Button 
-                        type="submit" 
-                        disabled={isCreating || !eventName.trim()} 
+                    <Button
+                        type="submit"
+                        disabled={isCreating || !eventName.trim()}
                         className="bg-blue-600 hover:bg-blue-500 text-white font-bold h-auto py-2.5 px-5 rounded-xl flex items-center gap-2 cursor-pointer transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-blue-500/25 disabled:opacity-50 disabled:scale-100"
                     >
                         <Plus size={16} />
@@ -68,10 +68,10 @@ export function SessionManager({ activeSessions }: { activeSessions: Session[] }
                                     <span className="text-[10px] font-mono text-slate-500 mt-0.5">SESSION ID: #{session.id}</span>
                                 </div>
                             </div>
-                            <Button 
-                                onClick={() => handleClose(session.id)} 
-                                variant="outline" 
-                                size="sm" 
+                            <Button
+                                onClick={() => handleClose(session.id)}
+                                variant="outline"
+                                size="sm"
                                 className="h-auto py-1.5 px-3.5 border-rose-500/30 text-rose-400 hover:text-white hover:bg-rose-600/20 hover:border-rose-500 cursor-pointer rounded-lg font-semibold text-xs tracking-wide transition-all"
                             >
                                 Close Event

@@ -132,6 +132,17 @@ export function IncidentForm({ activeSessions }: { activeSessions: Session[] }) 
             return;
         }
 
+        // Validate required fields explicitly
+        if (!callTaker.trim()) {
+            alert("Dispatcher (Call Taker) cannot be empty. Please enter a valid name or code.");
+            return;
+        }
+
+        if (!responder.trim()) {
+            alert("Responder cannot be empty. Please enter the assigned field responder.");
+            return;
+        }
+
         const timestamp = new Date(datetime).getTime();
 
         const incidentData: InsertIncident = {
@@ -178,7 +189,7 @@ export function IncidentForm({ activeSessions }: { activeSessions: Session[] }) 
     };
 
     return (
-        <form onSubmit={handleSubmit} className="flex flex-col gap-5 bg-slate-900/40 backdrop-blur-md p-6 rounded-2xl border border-slate-800/80 shadow-2xl h-[70vh] overflow-y-auto">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5 bg-slate-900/40 backdrop-blur-md p-6 rounded-2xl border border-slate-800/80 shadow-2xl h-full overflow-y-auto">
             <div className="sticky top-0 bg-slate-900/80 backdrop-blur-md pb-3 z-10 border-b border-slate-800 flex items-center justify-between">
                 <h2 className="text-lg font-bold text-white tracking-wide flex items-center gap-2">
                     <ShieldAlert size={20} className="text-red-500" />
@@ -316,6 +327,7 @@ export function IncidentForm({ activeSessions }: { activeSessions: Session[] }) 
                         </label>
                         <input 
                             type="text" 
+                            required
                             value={responder} 
                             onChange={(e) => setResponder(e.target.value)} 
                             className="bg-slate-950 border border-slate-800 text-white rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-600 focus:border-blue-500 focus:outline-none transition-all placeholder-slate-600" 

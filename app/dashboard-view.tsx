@@ -1,7 +1,17 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { getIncidents, getResources } from "./actions";
+import { 
+    getIncidents, 
+    getVehicles,
+    getWaterRescueEquipment,
+    getPersonnel,
+    getPreparedness,
+    getFloodedAreas,
+    getWaterLevels,
+    Session
+} from "./actions";
+import { isWaterRelatedEvent } from "./admin/flood-form";
 import { RealTimeClock } from "./real-time-clock";
 import {
     Ambulance,
@@ -12,7 +22,14 @@ import {
     AlertTriangle,
     CheckCircle,
     Info,
-    Activity
+    Activity,
+    Truck,
+    Users,
+    Anchor,
+    ShieldCheck,
+    Droplets,
+    Waves,
+    MapPin
 } from "lucide-react";
 
 export function SeverityBadge({ severity }: { severity: string }) {
@@ -44,25 +61,52 @@ export function SeverityBadge({ severity }: { severity: string }) {
     );
 }
 
-export function DashboardView({ sessionId }: { sessionId: number }) {
+export function DashboardView({ session }: { session: Session }) {
+    const sessionId = session.id;
+    const isWaterEvent = isWaterRelatedEvent(session.name);
+
     const { data: incidents = [] } = useQuery({
         queryKey: ['incidents', 'session', sessionId],
         queryFn: () => getIncidents(sessionId),
         refetchInterval: 1000
     });
 
-    const { data: resources = {
-        ambulances_active: 12,
-        ambulances_total: 15,
-        fire_trucks_active: 4,
-        fire_trucks_total: 5,
-        rescue_boats_active: 8,
-        rescue_boats_total: 8,
-        personnel_total: 142
-    } } = useQuery({
-        queryKey: ['resources', 'all'],
-        queryFn: getResources,
+    const { data: vehicles = [] } = useQuery({
+        queryKey: ['vehicles'],
+        queryFn: getVehicles,
         refetchInterval: 1000
+    });
+
+    const { data: equipment = [] } = useQuery({
+        queryKey: ['waterRescueEquipment'],
+        queryFn: getWaterRescueEquipment,
+        refetchInterval: 1000
+    });
+
+    const { data: personnel = [] } = useQuery({
+        queryKey: ['personnel', 'session', sessionId],
+        queryFn: () => getPersonnel(sessionId),
+        refetchInterval: 1000
+    });
+
+    const { data: preparedness = [] } = useQuery({
+        queryKey: ['preparedness', 'session', sessionId],
+        queryFn: () => getPreparedness(sessionId),
+        refetchInterval: 1000
+    });
+
+    const { data: floodedAreas = [] } = useQuery({
+        queryKey: ['floodedAreas', 'session', sessionId],
+        queryFn: () => getFloodedAreas(sessionId),
+        refetchInterval: 1000,
+        enabled: isWaterEvent
+    });
+
+    const { data: waterLevels = [] } = useQuery({
+        queryKey: ['waterLevels', 'session', sessionId],
+        queryFn: () => getWaterLevels(sessionId),
+        refetchInterval: 1000,
+        enabled: isWaterEvent
     });
 
     // Aggregations
@@ -137,52 +181,88 @@ export function DashboardView({ sessionId }: { sessionId: number }) {
 
             <div className="grid grid-cols-4 gap-6 flex-1 overflow-hidden">
 
-                {/* Left Column: Breakdown & Status */}
-                <div className="col-span-1 flex flex-col gap-6">
-                    <div className="bg-slate-800/80 p-6 rounded-2xl border border-slate-600 shadow-xl flex flex-col h-1/2">
-                        <h2 className="text-2xl font-bold mb-4 uppercase tracking-wider text-slate-300 border-b border-slate-600 pb-2">Incident Types</h2>
-                        <div className="flex-1 overflow-y-auto space-y-3 pr-2">
-                            {Object.entries(typeCount).sort((a, b) => b[1] - a[1]).map(([type, count]) => (
-                                <div key={type} className="flex flex-col">
-                                    <div className="flex justify-between text-sm mb-1">
-                                        <span>{type}</span>
-                                        <span className="font-bold">{count}</span>
+                {/* Left Column: Operations Status */}
+                <div className="col-span-1 flex flex-col gap-6 overflow-y-auto pr-2">
+                    {/* Disaster Preparedness */}
+                    {preparedness.length > 0 && (
+                        <div className="bg-slate-800/80 p-6 rounded-2xl border border-amber-900/50 shadow-xl shrink-0">
+                            <h2 className="text-2xl font-bold mb-4 uppercase tracking-wider text-amber-500 border-b border-amber-900/50 pb-2 flex items-center gap-2">
+                                <ShieldCheck size={20} className="text-amber-500" />
+                                Preparedness Directives
+                            </h2>
+                            <div className="space-y-3">
+                                {preparedness.map(p => (
+                                    <div key={p.id} className="bg-amber-950/20 border border-amber-500/20 p-3 rounded-lg">
+                                        <h4 className="text-sm font-bold text-amber-400 mb-1">{p.title}</h4>
+                                        <p className="text-xs text-amber-100/70 leading-relaxed">{p.description}</p>
                                     </div>
-                                    <div className="w-full bg-slate-700 rounded-full h-2">
-                                        <div className="bg-blue-500 h-2 rounded-full" style={{ width: `${(count / totalIncidents) * 100}%` }}></div>
-                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Typhoon specific sections */}
+                    {isWaterEvent && (
+                        <>
+                            {/* Water Levels */}
+                            <div className="bg-slate-800/80 p-6 rounded-2xl border border-blue-900/50 shadow-xl shrink-0">
+                                <h2 className="text-2xl font-bold mb-4 uppercase tracking-wider text-blue-400 border-b border-blue-900/50 pb-2 flex items-center gap-2">
+                                    <Waves size={20} className="text-blue-400" />
+                                    Water Levels (m)
+                                </h2>
+                                <div className="space-y-4">
+                                    {waterLevels.map(w => {
+                                        let statusColor = "text-emerald-400";
+                                        if (w.status === "Rising") { statusColor = "text-yellow-400"; }
+                                        if (w.status === "Critical") { statusColor = "text-orange-400"; }
+                                        if (w.status === "Overflow") { statusColor = "text-red-400"; }
+
+                                        return (
+                                            <div key={w.id} className="flex flex-col bg-slate-900/50 p-3 rounded-lg border border-slate-700/50 gap-2">
+                                                <div className="flex justify-between items-center">
+                                                    <span className="font-semibold text-slate-200">{w.waterway_name}</span>
+                                                    <div className="flex flex-col items-end">
+                                                        <span className={`text-xl font-black ${statusColor}`}>{w.level_meters.toFixed(1)}</span>
+                                                        <span className={`text-[10px] uppercase tracking-widest font-bold ${statusColor}`}>{w.status}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
                                 </div>
-                            ))}
-                        </div>
-                    </div>
+                            </div>
 
-                    <div className="bg-slate-800/80 p-6 rounded-2xl border border-slate-600 shadow-xl flex flex-col h-1/2">
-                        <h2 className="text-2xl font-bold mb-4 uppercase tracking-wider text-slate-300 border-b border-slate-600 pb-2">Barangay Heatmap</h2>
-                        <div className="flex-1 overflow-y-auto space-y-2 pr-2">
-                            {sortedBarangays.map(([brgy, count]) => {
-                                const percentage = (count / maxBarangayCount) * 100;
-                                let colorClass = "bg-blue-500";
-                                if (percentage > 80) colorClass = "bg-red-500";
-                                else if (percentage > 50) colorClass = "bg-orange-500";
-                                else if (percentage > 25) colorClass = "bg-yellow-500";
+                            {/* Flooded Areas */}
+                            <div className="bg-slate-800/80 p-6 rounded-2xl border border-cyan-900/50 shadow-xl shrink-0">
+                                <h2 className="text-2xl font-bold mb-4 uppercase tracking-wider text-cyan-400 border-b border-cyan-900/50 pb-2 flex items-center gap-2">
+                                    <Droplets size={20} className="text-cyan-400" />
+                                    Flooded Areas
+                                </h2>
+                                <div className="space-y-3">
+                                    {floodedAreas.length === 0 && <span className="text-slate-500 italic text-sm">No flooded areas reported.</span>}
+                                    {floodedAreas.map(f => {
+                                        let sevColor = "text-blue-400 bg-blue-500/10 border-blue-500/20";
+                                        if (f.severity === "Moderate") sevColor = "text-yellow-400 bg-yellow-500/10 border-yellow-500/20";
+                                        if (f.severity === "High") sevColor = "text-orange-400 bg-orange-500/10 border-orange-500/20";
+                                        if (f.severity === "Critical") sevColor = "text-red-400 bg-red-500/10 border-red-500/20";
 
-                                return (
-                                    <div key={brgy} className="flex flex-col bg-slate-700/30 p-2 rounded-lg">
-                                        <div className="flex justify-between text-sm mb-1">
-                                            <span className="font-medium text-slate-200">{brgy}</span>
-                                            <span className="font-bold text-white">{count}</span>
-                                        </div>
-                                        <div className="w-full bg-slate-700 rounded-full h-1.5">
-                                            <div className={`${colorClass} h-1.5 rounded-full`} style={{ width: `${percentage}%` }}></div>
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                            {sortedBarangays.length === 0 && (
-                                <div className="text-slate-500 italic text-center py-4">No data yet</div>
-                            )}
-                        </div>
-                    </div>
+                                        return (
+                                            <div key={f.id} className="bg-slate-900/50 border border-slate-700/50 p-3 rounded-lg">
+                                                <div className="flex justify-between items-center mb-1.5">
+                                                    <span className="font-bold text-white text-sm">{f.barangay}</span>
+                                                    <span className={`text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded border ${sevColor}`}>{f.severity}</span>
+                                                </div>
+                                                <p className="text-xs text-slate-400 flex items-start gap-1.5">
+                                                    <MapPin size={12} className="shrink-0 mt-0.5" />
+                                                    <span className="leading-tight">{f.area_description}</span>
+                                                </p>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        </>
+                    )}
                 </div>
 
                 {/* Center Column: Log */}
@@ -226,61 +306,124 @@ export function DashboardView({ sessionId }: { sessionId: number }) {
                     </div>
                 </div>
 
-                {/* Right Column: Resources & Contacts */}
-                <div className="col-span-1 flex flex-col gap-6">
-                    <div className="bg-slate-800/80 p-6 rounded-2xl border border-slate-600 shadow-xl">
-                        <h2 className="text-2xl font-bold mb-4 uppercase tracking-wider text-slate-300 border-b border-slate-600 pb-2">Resource Monitoring</h2>
-                        <div className="space-y-4">
-                            <div className="flex flex-col bg-slate-700/50 p-3 rounded-lg gap-1">
-                                <div className="flex justify-between items-center">
-                                    <span className="flex items-center gap-2">
-                                        <Ambulance size={18} className="text-green-400" />
-                                        <span>Ambulances</span>
-                                    </span>
-                                    <span className="font-mono text-xl text-green-400">
-                                        {resources.ambulances_active}/{resources.ambulances_total}
-                                    </span>
+                {/* Right Column: Resources & Info */}
+                <div className="col-span-1 flex flex-col gap-6 overflow-y-auto pr-2">
+                    
+                    {/* Personnel Breakdown */}
+                    <div className="bg-slate-800/80 p-6 rounded-2xl border border-slate-600 shadow-xl shrink-0">
+                        <h2 className="text-2xl font-bold mb-4 uppercase tracking-wider text-slate-300 border-b border-slate-600 pb-2 flex items-center gap-2">
+                            <Users size={20} className="text-purple-400" />
+                            Deployed Personnel
+                        </h2>
+                        <div className="space-y-3">
+                            {personnel.length === 0 && <span className="text-slate-500 italic text-sm">No personnel data.</span>}
+                            {personnel.map(p => (
+                                <div key={p.id} className="flex justify-between items-center bg-slate-700/50 p-3 rounded-lg">
+                                    <span className="font-semibold text-slate-200">{p.agency}</span>
+                                    <div className="flex gap-2">
+                                        <span className="bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded text-xs font-bold border border-blue-500/30">D: {p.deployed}</span>
+                                        <span className="bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded text-xs font-bold border border-emerald-500/30">A: {p.available}</span>
+                                    </div>
                                 </div>
-                                <div className="w-full bg-slate-800 rounded-full h-1.5 mt-1">
-                                    <div className="bg-green-500 h-1.5 rounded-full" style={{ width: `${(resources.ambulances_active / resources.ambulances_total) * 100}%` }}></div>
-                                </div>
-                            </div>
-                            <div className="flex flex-col bg-slate-700/50 p-3 rounded-lg gap-1">
-                                <div className="flex justify-between items-center">
-                                    <span className="flex items-center gap-2">
-                                        <Flame size={18} className="text-yellow-400" />
-                                        <span>Fire Trucks</span>
-                                    </span>
-                                    <span className="font-mono text-xl text-yellow-400">
-                                        {resources.fire_trucks_active}/{resources.fire_trucks_total}
-                                    </span>
-                                </div>
-                                <div className="w-full bg-slate-800 rounded-full h-1.5 mt-1">
-                                    <div className="bg-yellow-500 h-1.5 rounded-full" style={{ width: `${(resources.fire_trucks_active / resources.fire_trucks_total) * 100}%` }}></div>
-                                </div>
-                            </div>
-                            <div className="flex justify-between items-center bg-slate-700/50 p-3 rounded-lg">
-                                <span className="flex items-center gap-2">
-                                    <Shield size={18} className="text-purple-400" />
-                                    <span>Personnel</span>
-                                </span>
-                                <span className="font-mono text-xl text-blue-400">
-                                    {resources.personnel_total}
-                                </span>
-                            </div>
+                            ))}
                         </div>
                     </div>
 
-                    <div className="bg-slate-800/80 p-6 rounded-2xl border border-slate-600 shadow-xl flex-1">
+                    {/* Vehicle Monitoring */}
+                    <div className="bg-slate-800/80 p-6 rounded-2xl border border-slate-600 shadow-xl shrink-0">
+                        <h2 className="text-2xl font-bold mb-4 uppercase tracking-wider text-slate-300 border-b border-slate-600 pb-2 flex items-center gap-2">
+                            <Truck size={20} className="text-emerald-400" />
+                            Vehicle Status
+                        </h2>
+                        <div className="space-y-4">
+                            {vehicles.map(v => (
+                                <div key={v.id} className="flex flex-col bg-slate-700/50 p-3 rounded-lg gap-1">
+                                    <div className="flex justify-between items-center">
+                                        <span className="font-semibold text-slate-200">{v.name}</span>
+                                        <span className="font-mono text-xl text-emerald-400">
+                                            {v.active}/{v.total}
+                                        </span>
+                                    </div>
+                                    <div className="w-full bg-slate-800 rounded-full h-1.5 mt-1">
+                                        <div className="bg-emerald-500 h-1.5 rounded-full transition-all duration-500" style={{ width: `${v.total > 0 ? (v.active / v.total) * 100 : 0}%` }}></div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Water Rescue Equipment */}
+                    <div className="bg-slate-800/80 p-6 rounded-2xl border border-slate-600 shadow-xl shrink-0">
+                        <h2 className="text-2xl font-bold mb-4 uppercase tracking-wider text-slate-300 border-b border-slate-600 pb-2 flex items-center gap-2">
+                            <Anchor size={20} className="text-cyan-400" />
+                            Rescue Equipment
+                        </h2>
+                        <div className="grid grid-cols-2 gap-3">
+                            {equipment.length === 0 && <span className="text-slate-500 italic text-sm col-span-2">No equipment logged.</span>}
+                            {equipment.map(e => (
+                                <div key={e.id} className="bg-slate-700/50 p-3 rounded-lg flex flex-col items-center justify-center text-center">
+                                    <span className="text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">{e.name}</span>
+                                    <span className="text-2xl font-black text-cyan-400">{e.deployed}<span className="text-sm text-cyan-700">/{e.quantity}</span></span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="bg-slate-800/80 p-6 rounded-2xl border border-slate-600 shadow-xl flex flex-col h-[400px] shrink-0">
+                        <h2 className="text-2xl font-bold mb-4 uppercase tracking-wider text-slate-300 border-b border-slate-600 pb-2">Incident Types</h2>
+                        <div className="flex-1 overflow-y-auto space-y-3 pr-2">
+                            {Object.entries(typeCount).sort((a, b) => b[1] - a[1]).map(([type, count]) => (
+                                <div key={type} className="flex flex-col">
+                                    <div className="flex justify-between text-sm mb-1">
+                                        <span>{type}</span>
+                                        <span className="font-bold">{count}</span>
+                                    </div>
+                                    <div className="w-full bg-slate-700 rounded-full h-2">
+                                        <div className="bg-blue-500 h-2 rounded-full" style={{ width: `${(count / totalIncidents) * 100}%` }}></div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="bg-slate-800/80 p-6 rounded-2xl border border-slate-600 shadow-xl flex flex-col h-[400px] shrink-0">
+                        <h2 className="text-2xl font-bold mb-4 uppercase tracking-wider text-slate-300 border-b border-slate-600 pb-2">Barangay Heatmap</h2>
+                        <div className="flex-1 overflow-y-auto space-y-2 pr-2">
+                            {sortedBarangays.map(([brgy, count]) => {
+                                const percentage = (count / maxBarangayCount) * 100;
+                                let colorClass = "bg-blue-500";
+                                if (percentage > 80) colorClass = "bg-red-500";
+                                else if (percentage > 50) colorClass = "bg-orange-500";
+                                else if (percentage > 25) colorClass = "bg-yellow-500";
+
+                                return (
+                                    <div key={brgy} className="flex flex-col bg-slate-700/30 p-2 rounded-lg">
+                                        <div className="flex justify-between text-sm mb-1">
+                                            <span className="font-medium text-slate-200">{brgy}</span>
+                                            <span className="font-bold text-white">{count}</span>
+                                        </div>
+                                        <div className="w-full bg-slate-700 rounded-full h-1.5">
+                                            <div className={`${colorClass} h-1.5 rounded-full`} style={{ width: `${percentage}%` }}></div>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                            {sortedBarangays.length === 0 && (
+                                <div className="text-slate-500 italic text-center py-4">No data yet</div>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="bg-slate-800/80 p-6 rounded-2xl border border-slate-600 shadow-xl shrink-0">
                         <h2 className="text-2xl font-bold mb-4 uppercase tracking-wider text-slate-300 border-b border-slate-600 pb-2">Emergency Contacts</h2>
                         <div className="space-y-6">
                             <div>
-                                <p className="text-4xl font-bold text-slate-400 mb-1">CDRRMO / EMS</p>
-                                <p className="text-8xl font-black text-white tracking-tighter">137-135</p>
+                                <p className="text-2xl font-bold text-slate-400 mb-1">CDRRMO / EMS</p>
+                                <p className="text-5xl font-black text-white tracking-tighter">137-135</p>
                             </div>
                             <div>
-                                <p className="text-4xl font-bold text-slate-400 mb-1">Local</p>
-                                <p className="text-8xl font-black text-white tracking-tighter">160-165</p>
+                                <p className="text-2xl font-bold text-slate-400 mb-1">Local Hotline</p>
+                                <p className="text-5xl font-black text-white tracking-tighter">160-165</p>
                             </div>
                         </div>
                     </div>

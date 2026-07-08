@@ -1,26 +1,28 @@
 "use client";
 
-import { Incident, Session } from "../actions";
+import { Incident, Session, getEventReportData } from "../actions";
 import { useRouter } from "next/navigation";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, AreaChart, Area } from "recharts";
 import dayjs from "dayjs";
 import { useState } from "react";
 import { SeverityBadge } from "../dashboard-view";
+import { Download } from "lucide-react";
 
-export function KpiView({ 
-    initialIncidents, 
-    sessions, 
-    initialRange, 
-    initialSessionId 
-}: { 
-    initialIncidents: Incident[], 
-    sessions: Session[], 
-    initialRange: string, 
-    initialSessionId?: number 
+export function KpiView({
+    initialIncidents,
+    sessions,
+    initialRange,
+    initialSessionId
+}: {
+    initialIncidents: Incident[],
+    sessions: Session[],
+    initialRange: string,
+    initialSessionId?: number
 }) {
     const router = useRouter();
     const [range, setRange] = useState(initialRange);
     const [sessionId, setSessionId] = useState<number | undefined>(initialSessionId);
+    const [isDownloading, setIsDownloading] = useState(false);
 
     const handleRangeChange = (newRange: string) => {
         setRange(newRange);
@@ -41,29 +43,114 @@ export function KpiView({
         }
     };
 
+    const handleDownloadReport = async () => {
+        if (!sessionId) return;
+        setIsDownloading(true);
+        try {
+            const data = await getEventReportData(sessionId);
+            let csv = `CEDOC Final Event Report\n`;
+            csv += `Event Name,${data.session.name}\n`;
+            csv += `Status,${data.session.status.toUpperCase()}\n`;
+            csv += `Started At,${dayjs(data.session.started_at).format("MMM D YYYY HH:mm")}\n`;
+            csv += `Closed At,${data.session.closed_at ? dayjs(data.session.closed_at).format("MMM D YYYY HH:mm") : 'Ongoing'}\n\n`;
+
+            csv += `--- INCIDENT LOGS ---\n`;
+            csv += `Date,ID,Name,Type,Barangay,Location,Severity,Status,Call Taker,Responder,Dead,Injured,Missing,Evac Families,Evac Individuals,Details\n`;
+            data.incidents.forEach(inc => {
+                csv += `"${dayjs(inc.created_at).format("MMM D YYYY HH:mm")}","${inc.id}","${inc.name}","${inc.type}","${inc.barangay}","${inc.location}","${inc.severity}","${inc.status}","${inc.call_taker}","${inc.responder}","${inc.casualties_dead}","${inc.casualties_injured}","${inc.casualties_missing}","${inc.evacuated_families}","${inc.evacuated_individuals}","${inc.details.replace(/"/g, '""')}"\n`;
+            });
+            csv += `\n`;
+
+            csv += `--- PERSONNEL DEPLOYED ---\n`;
+            csv += `Agency,Deployed,Available\n`;
+            data.personnel.forEach(p => {
+                csv += `"${p.agency}","${p.deployed}","${p.available}"\n`;
+            });
+            csv += `\n`;
+
+            csv += `--- VEHICLES ---\n`;
+            csv += `Vehicle Name,Active,Total\n`;
+            data.vehicles.forEach(v => {
+                csv += `"${v.name}","${v.active}","${v.total}"\n`;
+            });
+            csv += `\n`;
+
+            csv += `--- RESCUE EQUIPMENT ---\n`;
+            csv += `Equipment Name,Deployed,Quantity\n`;
+            data.equipment.forEach(e => {
+                csv += `"${e.name}","${e.deployed}","${e.quantity}"\n`;
+            });
+            csv += `\n`;
+
+            csv += `--- PREPAREDNESS DIRECTIVES ---\n`;
+            csv += `Date,Title,Description\n`;
+            data.preparedness.forEach(p => {
+                csv += `"${dayjs(p.created_at).format("MMM D YYYY HH:mm")}","${p.title.replace(/"/g, '""')}","${p.description.replace(/"/g, '""')}"\n`;
+            });
+            csv += `\n`;
+
+            csv += `--- FLOODED AREAS ---\n`;
+            csv += `Date,Barangay,Area Description,Severity\n`;
+            data.floodedAreas.forEach(f => {
+                csv += `"${dayjs(f.created_at).format("MMM D YYYY HH:mm")}","${f.barangay}","${f.area_description.replace(/"/g, '""')}","${f.severity}"\n`;
+            });
+            csv += `\n`;
+
+            csv += `--- WATER LEVELS ---\n`;
+            csv += `Date,Waterway Name,Level (m),Status\n`;
+            data.waterLevels.forEach(w => {
+                csv += `"${dayjs(w.updated_at).format("MMM D YYYY HH:mm")}","${w.waterway_name}","${w.level_meters}","${w.status}"\n`;
+            });
+            csv += `\n`;
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `CEDOC_Report_${data.session.name.replace(/\s+/g, '_')}_${dayjs().format('YYYY-MM-DD')}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error("Failed to generate report", error);
+            alert("Failed to generate report.");
+        } finally {
+            setIsDownloading(false);
+        }
+    };
+
     // --- Data Aggregation ---
-    
+
     // 1. Top Responders
-    const responderCounts: Record<string, number> = {};
+    const responderCounts: Record<string, { display: string, count: number }> = {};
     initialIncidents.forEach(inc => {
-        if (inc.responder && inc.responder !== "Unknown") {
-            responderCounts[inc.responder] = (responderCounts[inc.responder] || 0) + 1;
+        if (inc.responder && inc.responder.toUpperCase() !== "UNKNOWN") {
+            const key = inc.responder.toUpperCase();
+            if (!responderCounts[key]) {
+                const display = inc.responder.charAt(0).toUpperCase() + inc.responder.slice(1).toLowerCase();
+                responderCounts[key] = { display, count: 0 };
+            }
+            responderCounts[key].count += 1;
         }
     });
-    const topResponders = Object.entries(responderCounts)
-        .map(([name, count]) => ({ name, count }))
+    const topResponders = Object.values(responderCounts)
+        .map(obj => ({ name: obj.display, count: obj.count }))
         .sort((a, b) => b.count - a.count)
         .slice(0, 5);
 
     // 2. Top Call Takers
-    const callTakerCounts: Record<string, number> = {};
+    const callTakerCounts: Record<string, { display: string, count: number }> = {};
     initialIncidents.forEach(inc => {
-        if (inc.call_taker && inc.call_taker !== "Unknown") {
-            callTakerCounts[inc.call_taker] = (callTakerCounts[inc.call_taker] || 0) + 1;
+        if (inc.call_taker && inc.call_taker.toUpperCase() !== "UNKNOWN") {
+            const key = inc.call_taker.toUpperCase();
+            if (!callTakerCounts[key]) {
+                const display = inc.call_taker.charAt(0).toUpperCase() + inc.call_taker.slice(1).toLowerCase();
+                callTakerCounts[key] = { display, count: 0 };
+            }
+            callTakerCounts[key].count += 1;
         }
     });
-    const topCallTakers = Object.entries(callTakerCounts)
-        .map(([name, count]) => ({ name, count }))
+    const topCallTakers = Object.values(callTakerCounts)
+        .map(obj => ({ name: obj.display, count: obj.count }))
         .sort((a, b) => b.count - a.count)
         .slice(0, 5);
 
@@ -110,8 +197,8 @@ export function KpiView({
                 <div className="h-6 w-px bg-slate-600 mx-2"></div>
 
                 <span className="font-bold text-slate-400 uppercase tracking-widest text-sm">Specific Event:</span>
-                <select 
-                    value={sessionId || ""} 
+                <select
+                    value={sessionId || ""}
                     onChange={e => handleSessionChange(e.target.value)}
                     className="bg-slate-800 border border-slate-600 text-white rounded-md px-4 py-2 font-medium focus:ring-2 focus:ring-purple-500 outline-none min-w-[250px]"
                 >
@@ -120,6 +207,17 @@ export function KpiView({
                         <option key={s.id} value={s.id}>{s.name}</option>
                     ))}
                 </select>
+
+                {sessionId && (
+                    <button 
+                        onClick={handleDownloadReport} 
+                        disabled={isDownloading}
+                        className="ml-auto flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-md font-bold transition-all disabled:opacity-50"
+                    >
+                        <Download size={18} />
+                        {isDownloading ? "Generating..." : "Download Final Report"}
+                    </button>
+                )}
             </div>
 
             {/* Top Stat Cards */}
@@ -154,7 +252,7 @@ export function KpiView({
 
             {/* Charts Grid */}
             <div className="grid grid-cols-3 gap-6">
-                
+
                 <div className="bg-slate-800 p-6 rounded-xl border border-slate-700 shadow-xl">
                     <h3 className="text-lg font-bold text-slate-300 mb-6 uppercase tracking-wider">Top Incident Types</h3>
                     <div className="h-64">
@@ -162,7 +260,7 @@ export function KpiView({
                             <BarChart data={commonTypes} layout="vertical" margin={{ top: 0, right: 0, left: 40, bottom: 0 }}>
                                 <CartesianGrid strokeDasharray="3 3" stroke="#334155" horizontal={false} />
                                 <XAxis type="number" stroke="#94a3b8" />
-                                <YAxis dataKey="name" type="category" stroke="#94a3b8" width={100} tick={{fontSize: 12}} />
+                                <YAxis dataKey="name" type="category" stroke="#94a3b8" width={100} tick={{ fontSize: 12 }} />
                                 <Tooltip contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '8px', color: '#fff' }} />
                                 <Bar dataKey="count" fill="#ef4444" radius={[0, 4, 4, 0]} barSize={24} />
                             </BarChart>
@@ -177,7 +275,7 @@ export function KpiView({
                             <BarChart data={topResponders} layout="vertical" margin={{ top: 0, right: 0, left: 40, bottom: 0 }}>
                                 <CartesianGrid strokeDasharray="3 3" stroke="#334155" horizontal={false} />
                                 <XAxis type="number" stroke="#94a3b8" />
-                                <YAxis dataKey="name" type="category" stroke="#94a3b8" width={100} tick={{fontSize: 12}} />
+                                <YAxis dataKey="name" type="category" stroke="#94a3b8" width={100} tick={{ fontSize: 12 }} />
                                 <Tooltip contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '8px', color: '#fff' }} />
                                 <Bar dataKey="count" fill="#3b82f6" radius={[0, 4, 4, 0]} barSize={24} />
                             </BarChart>
@@ -192,7 +290,7 @@ export function KpiView({
                             <BarChart data={topCallTakers} layout="vertical" margin={{ top: 0, right: 0, left: 40, bottom: 0 }}>
                                 <CartesianGrid strokeDasharray="3 3" stroke="#334155" horizontal={false} />
                                 <XAxis type="number" stroke="#94a3b8" />
-                                <YAxis dataKey="name" type="category" stroke="#94a3b8" width={100} tick={{fontSize: 12}} />
+                                <YAxis dataKey="name" type="category" stroke="#94a3b8" width={100} tick={{ fontSize: 12 }} />
                                 <Tooltip contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '8px', color: '#fff' }} />
                                 <Bar dataKey="count" fill="#a855f7" radius={[0, 4, 4, 0]} barSize={24} />
                             </BarChart>
@@ -207,8 +305,8 @@ export function KpiView({
                             <AreaChart data={hourCounts} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                                 <defs>
                                     <linearGradient id="colorCount" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.3}/>
-                                    <stop offset="95%" stopColor="#f59e0b" stopOpacity={0}/>
+                                        <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.3} />
+                                        <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
                                     </linearGradient>
                                 </defs>
                                 <XAxis dataKey="hour" stroke="#94a3b8" />

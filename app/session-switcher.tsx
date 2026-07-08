@@ -50,7 +50,7 @@ export function SessionSwitcher({ activeSessions }: { activeSessions: Session[] 
             )}
             
             <div className="flex-1 overflow-hidden">
-                <DashboardView sessionId={selectedSessionId} />
+                <DashboardView session={selectedSession} />
             </div>
         </div>
     );

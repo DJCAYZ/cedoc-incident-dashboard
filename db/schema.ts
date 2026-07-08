@@ -31,13 +31,56 @@ export const incidentsTable = sqliteTable("incidents", {
   resolved_at: int(),
 });
 
-export const resourcesTable = sqliteTable("resources", {
-  id: int().primaryKey().default(1),
-  ambulances_active: int().notNull().default(12),
-  ambulances_total: int().notNull().default(15),
-  fire_trucks_active: int().notNull().default(4),
-  fire_trucks_total: int().notNull().default(5),
-  rescue_boats_active: int().notNull().default(8),
-  rescue_boats_total: int().notNull().default(8),
-  personnel_total: int().notNull().default(142)
+// Dynamic vehicles — each row is one vehicle type (e.g. Ambulance, Rescue Boat, Rescue Truck)
+export const vehiclesTable = sqliteTable("vehicles", {
+  id: int().primaryKey({ autoIncrement: true }),
+  name: text().notNull(),
+  active: int().notNull().default(0),
+  total: int().notNull().default(0),
+});
+
+// Dynamic water rescue equipment — each row is one item type (e.g. Vest, Helmet, Floater)
+export const waterRescueEquipmentTable = sqliteTable("water_rescue_equipment", {
+  id: int().primaryKey({ autoIncrement: true }),
+  name: text().notNull(),
+  quantity: int().notNull().default(0),
+  deployed: int().notNull().default(0),
+});
+
+// Personnel by agency — deployed/available per session
+export const personnelTable = sqliteTable("personnel", {
+  id: int().primaryKey({ autoIncrement: true }),
+  session_id: int().references(() => sessionsTable.id),
+  agency: text().notNull(),
+  deployed: int().notNull().default(0),
+  available: int().notNull().default(0),
+});
+
+// Disaster preparedness measures — title + description per session
+export const preparednessTable = sqliteTable("preparedness", {
+  id: int().primaryKey({ autoIncrement: true }),
+  session_id: int().references(() => sessionsTable.id),
+  title: text().notNull(),
+  description: text().notNull(),
+  created_at: int().notNull(),
+});
+
+// Flooded areas — per session, for typhoon/rain events
+export const floodedAreasTable = sqliteTable("flooded_areas", {
+  id: int().primaryKey({ autoIncrement: true }),
+  session_id: int().references(() => sessionsTable.id),
+  barangay: text().notNull(),
+  area_description: text().notNull(),
+  severity: text().notNull().default('Moderate'),
+  created_at: int().notNull(),
+});
+
+// Water levels — manual entry for waterways, per session
+export const waterLevelsTable = sqliteTable("water_levels", {
+  id: int().primaryKey({ autoIncrement: true }),
+  session_id: int().references(() => sessionsTable.id),
+  waterway_name: text().notNull(),
+  level_meters: int().notNull().default(0),
+  status: text().notNull().default('Normal'),
+  updated_at: int().notNull(),
 });

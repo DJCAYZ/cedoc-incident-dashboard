@@ -5,7 +5,7 @@ import dayjs from "dayjs";
 import { Button } from "@/components/ui/button";
 import { SeverityBadge } from "../dashboard-view";
 import { resolveIncident, updateIncident, Incident } from "../actions";
-import { Edit3, CheckCircle2, X, Save, AlertCircle, Clock, MapPin } from "lucide-react";
+import { Edit3, CheckCircle2, X, Save, AlertCircle, Clock, MapPin, Search, Filter, ArrowUpDown } from "lucide-react";
 
 interface IncidentListProps {
     title: string;
@@ -26,6 +26,50 @@ export function IncidentList({ title, incidents, showCloseButton = true }: Incid
     const [editDetails, setEditDetails] = useState("");
     const [editStatus, setEditStatus] = useState("");
     const [isSaving, setIsSaving] = useState(false);
+
+    const [filterType, setFilterType] = useState("All");
+    const [filterSeverity, setFilterSeverity] = useState("All");
+    const [sortBy, setSortBy] = useState("Time (Newest)");
+    const [searchQuery, setSearchQuery] = useState("");
+
+    const severityValues: Record<string, number> = {
+        "🔴 Critical": 4,
+        "🟠 High": 3,
+        "🟡 Moderate": 2,
+        "🟢 Normal": 1
+    };
+
+    const processedIncidents = incidents.filter(inc => {
+        if (searchQuery) {
+            const query = searchQuery.toLowerCase();
+            const matchesName = inc.name.toLowerCase().includes(query);
+            const matchesLoc = inc.location.toLowerCase().includes(query);
+            const matchesBrgy = inc.barangay.toLowerCase().includes(query);
+            if (!matchesName && !matchesLoc && !matchesBrgy) return false;
+        }
+
+        if (filterType !== "All" && inc.type !== filterType) return false;
+
+        if (filterSeverity !== "All") {
+            const sevLevel = inc.severity.split(" ")[1]; 
+            if (sevLevel !== filterSeverity) return false;
+        }
+
+        return true;
+    }).sort((a, b) => {
+        if (sortBy === "Time (Newest)") return b.created_at - a.created_at;
+        if (sortBy === "Time (Oldest)") return a.created_at - b.created_at;
+        if (sortBy === "Alphabetical (A-Z)") return a.name.localeCompare(b.name);
+        if (sortBy === "Alphabetical (Z-A)") return b.name.localeCompare(a.name);
+        if (sortBy === "Severity") {
+            const sevA = severityValues[a.severity] || 0;
+            const sevB = severityValues[b.severity] || 0;
+            return sevB - sevA;
+        }
+        return 0;
+    });
+
+    const uniqueTypes = ["All", ...Array.from(new Set(incidents.map(i => i.type)))];
 
     const handleEditClick = (incident: Incident) => {
         setEditingId(incident.id);
@@ -53,18 +97,72 @@ export function IncidentList({ title, incidents, showCloseButton = true }: Incid
         <div className="bg-slate-900/40 backdrop-blur-md p-6 rounded-2xl border border-slate-800/80 shadow-2xl flex-1 flex flex-col overflow-hidden h-full">
             <div className="flex items-center justify-between border-b border-slate-800 pb-3 mb-4 shrink-0">
                 <h2 className="text-lg font-bold text-white tracking-wide">{title}</h2>
-                <span className="text-xs bg-slate-950 px-2.5 py-1 rounded-md text-slate-500 font-mono font-semibold border border-slate-800/80">{incidents.length} Records</span>
+                <span className="text-xs bg-slate-950 px-2.5 py-1 rounded-md text-slate-500 font-mono font-semibold border border-slate-800/80">{processedIncidents.length} Records</span>
+            </div>
+
+            {/* Filter and Sort Bar */}
+            <div className="flex flex-col gap-3 mb-4 shrink-0 bg-slate-950/30 p-3 rounded-xl border border-slate-800/50">
+                <div className="relative">
+                    <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+                    <input 
+                        type="text" 
+                        placeholder="Search incident name, location, or barangay..." 
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full bg-slate-900 border border-slate-700 text-sm text-slate-200 rounded-lg pl-9 pr-3 py-2 focus:ring-2 focus:ring-blue-600 focus:outline-none placeholder-slate-600"
+                    />
+                </div>
+                <div className="flex gap-2">
+                    <div className="flex-1 flex flex-col gap-1">
+                        <label className="text-[9px] uppercase font-bold text-slate-500 flex items-center gap-1"><Filter size={10}/> Type</label>
+                        <select 
+                            value={filterType} 
+                            onChange={e => setFilterType(e.target.value)}
+                            className="bg-slate-900 border border-slate-700 text-xs text-slate-300 rounded-md p-1.5 focus:ring-1 focus:ring-blue-500 outline-none"
+                        >
+                            {uniqueTypes.map(t => <option key={t} value={t}>{t}</option>)}
+                        </select>
+                    </div>
+                    <div className="flex-1 flex flex-col gap-1">
+                        <label className="text-[9px] uppercase font-bold text-slate-500 flex items-center gap-1"><Filter size={10}/> Severity</label>
+                        <select 
+                            value={filterSeverity} 
+                            onChange={e => setFilterSeverity(e.target.value)}
+                            className="bg-slate-900 border border-slate-700 text-xs text-slate-300 rounded-md p-1.5 focus:ring-1 focus:ring-blue-500 outline-none"
+                        >
+                            <option value="All">All</option>
+                            <option value="Critical">Critical</option>
+                            <option value="High">High</option>
+                            <option value="Moderate">Moderate</option>
+                            <option value="Normal">Normal</option>
+                        </select>
+                    </div>
+                    <div className="flex-[1.5] flex flex-col gap-1">
+                        <label className="text-[9px] uppercase font-bold text-slate-500 flex items-center gap-1"><ArrowUpDown size={10}/> Sort By</label>
+                        <select 
+                            value={sortBy} 
+                            onChange={e => setSortBy(e.target.value)}
+                            className="bg-slate-900 border border-slate-700 text-xs text-slate-300 rounded-md p-1.5 focus:ring-1 focus:ring-blue-500 outline-none"
+                        >
+                            <option value="Time (Newest)">Time (Newest)</option>
+                            <option value="Time (Oldest)">Time (Oldest)</option>
+                            <option value="Alphabetical (A-Z)">Alphabetical (A-Z)</option>
+                            <option value="Alphabetical (Z-A)">Alphabetical (Z-A)</option>
+                            <option value="Severity">Severity (Critical First)</option>
+                        </select>
+                    </div>
+                </div>
             </div>
 
             <div className="flex-1 overflow-y-auto space-y-4 pr-1">
-                {incidents.length === 0 && (
+                {processedIncidents.length === 0 && (
                     <div className="flex flex-col items-center justify-center py-10 text-slate-500 text-sm italic">
                         <AlertCircle size={20} className="mb-2 text-slate-600" />
                         <span>No logged incidents.</span>
                     </div>
                 )}
 
-                {incidents.map((incident) => {
+                {processedIncidents.map((incident) => {
                     if (editingId === incident.id) {
                         return (
                             <div key={incident.id} className="border-2 border-blue-500 bg-slate-900 shadow-xl shadow-blue-500/10 rounded-xl p-4 flex flex-col gap-3.5 animate-in fade-in zoom-in-95 duration-150">
