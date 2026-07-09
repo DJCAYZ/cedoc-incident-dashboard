@@ -28,6 +28,9 @@ export const incidentsTable = sqliteTable("incidents", {
   details: text().notNull().default(""),
   call_taker: text().notNull().default('Unknown'),
   responder: text().notNull().default('Unknown'),
+  caller_name: text().default(""),
+  caller_phone: text().default(""),
+  caller_age: int(),
   created_at: int().notNull(),
   resolved_at: int(),
 });
@@ -73,7 +76,17 @@ export const floodedAreasTable = sqliteTable("flooded_areas", {
   barangay: text().notNull(),
   area_description: text().notNull(),
   severity: text().notNull().default('Moderate'),
+  depth_meters: real().notNull().default(0),
+  flood_time: int(),
   created_at: int().notNull(),
+});
+
+// Flooded area updates (history) — 'Stable', 'Rising', 'Subsiding', 'Subsided'
+export const floodedAreaUpdatesTable = sqliteTable("flooded_area_updates", {
+  id: int().primaryKey({ autoIncrement: true }),
+  flooded_area_id: int().references(() => floodedAreasTable.id, { onDelete: 'cascade' }),
+  status: text().notNull(),
+  updated_at: int().notNull(),
 });
 
 // Water levels — manual entry for waterways, per session

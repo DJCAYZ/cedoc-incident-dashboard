@@ -257,7 +257,14 @@ export function DashboardView({ session }: { session: Session }) {
                                         return (
                                             <div key={w.id} className="flex flex-col bg-slate-900/50 p-3.5 rounded-lg border border-slate-700/50 gap-2">
                                                 <div className="flex justify-between items-center">
-                                                    <span className="text-base font-bold text-slate-100">{w.waterway_name}</span>
+                                                    <div className="flex flex-col">
+                                                        <span className="text-base font-bold text-slate-100">{w.waterway_name}</span>
+                                                        {w.updated_at ? (
+                                                            <span className="text-[10px] text-slate-400 font-bold mt-1 uppercase tracking-wider">
+                                                                As of: {dayjs(w.updated_at).format('MMM D, h:mm A')}
+                                                            </span>
+                                                        ) : null}
+                                                    </div>
                                                     <div className="flex flex-col items-end">
                                                         <span className={`text-2xl font-black ${statusColor}`}>{w.level_meters.toFixed(1)}</span>
                                                         <span className={`text-xs uppercase tracking-widest font-bold ${statusColor}`}>{w.status}</span>
@@ -293,6 +300,16 @@ export function DashboardView({ session }: { session: Session }) {
                                                     <MapPin size={14} className="shrink-0 mt-0.5" />
                                                     <span className="leading-tight">{f.area_description}</span>
                                                 </p>
+                                                {f.updates && f.updates.length > 0 && (
+                                                    <div className="mt-3 pt-2 border-t border-slate-700/50 flex flex-col gap-1.5">
+                                                        {f.updates.map(u => (
+                                                            <div key={u.id} className="flex justify-between items-center text-[11px] text-slate-400">
+                                                                <span className="font-bold text-slate-300">{u.status}</span>
+                                                                <span className="font-mono">{dayjs(u.updated_at).format('MMM D, h:mm A')}</span>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                )}
                                             </div>
                                         );
                                     })}

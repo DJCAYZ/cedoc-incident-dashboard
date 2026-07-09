@@ -2,13 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { upsertPersonnel, getPersonnel, Personnel, Session } from "../actions";
+import { upsertPersonnel, getPersonnel, deletePersonnel, Personnel, Session } from "../actions";
 import { Button } from "@/components/ui/button";
-import { Shield, Save, Users } from "lucide-react";
-
-const DEFAULT_AGENCIES = ["BFP", "PNP", "CDRRMD", "EMS", "Barangay", "Other"];
+import { Shield, Save, Users, Plus, Trash2 } from "lucide-react";
 
 interface AgencyRow {
+  id?: number;
   agency: string;
   deployed: number | "";
   available: number | "";
@@ -23,9 +22,7 @@ export function PersonnelForm({
   const [sessionId, setSessionId] = useState<number>(
     activeSessions.length > 0 ? activeSessions[0].id : 0
   );
-  const [agencies, setAgencies] = useState<AgencyRow[]>(
-    DEFAULT_AGENCIES.map((a) => ({ agency: a, deployed: 0, available: 0 }))
-  );
+  const [agencies, setAgencies] = useState<AgencyRow[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -36,25 +33,16 @@ export function PersonnelForm({
 
     getPersonnel(sessionId).then((data: Personnel[]) => {
       if (cancelled) return;
-      const merged = DEFAULT_AGENCIES.map((agency) => {
-        const existing = data.find((d) => d.agency === agency);
-        return {
-          agency,
-          deployed: existing?.deployed ?? 0,
-          available: existing?.available ?? 0,
-        };
-      });
-      // Include any extra agencies not in the default list
-      data.forEach((d) => {
-        if (!DEFAULT_AGENCIES.includes(d.agency)) {
-          merged.push({
-            agency: d.agency,
-            deployed: d.deployed,
-            available: d.available,
-          });
-        }
-      });
-      setAgencies(merged);
+      const mapped: AgencyRow[] = data.map((d) => ({
+        id: d.id,
+        agency: d.agency,
+        deployed: d.deployed,
+        available: d.available,
+      }));
+      if (mapped.length === 0) {
+        mapped.push({ agency: "", deployed: 0, available: 0 });
+      }
+      setAgencies(mapped);
     });
 
     return () => {
@@ -62,19 +50,49 @@ export function PersonnelForm({
     };
   }, [sessionId]);
 
+  const handleAddAgency = () => {
+    setAgencies([...agencies, { agency: "", deployed: 0, available: 0 }]);
+  };
+
+  const handleDeleteAgency = async (index: number, id?: number) => {
+    if (id) {
+      if (!confirm("Are you sure you want to delete this agency?")) return;
+      try {
+        await deletePersonnel(id);
+      } catch (e) {
+        console.error(e);
+        alert("Failed to delete agency");
+        return;
+      }
+    }
+    const updated = [...agencies];
+    updated.splice(index, 1);
+    setAgencies(updated);
+  };
+
   const handleSave = async () => {
     if (!sessionId) return;
     setIsSaving(true);
     setMessage("");
     try {
       for (const row of agencies) {
+        if (!row.agency.trim()) continue;
         await upsertPersonnel(
           sessionId,
-          row.agency,
+          row.agency.trim(),
           Number(row.deployed || 0),
           Number(row.available || 0)
         );
       }
+      
+      // Refresh local state to get new IDs
+      const refreshedData = await getPersonnel(sessionId);
+      setAgencies(refreshedData.map((d) => ({
+        id: d.id,
+        agency: d.agency,
+        deployed: d.deployed,
+        available: d.available,
+      })));
       setMessage("✓ Saved");
       setTimeout(() => setMessage(""), 2000);
       router.refresh();
@@ -142,62 +160,81 @@ export function PersonnelForm({
       {/* Agency Rows */}
       <div className="space-y-2">
         {/* Header */}
-        <div className="grid grid-cols-[1fr_80px_80px] gap-2 px-1 text-[9px] text-slate-500 uppercase tracking-wider font-bold">
-          <span>Agency</span>
+        <div className="grid grid-cols-[1fr_70px_70px_32px] gap-2 px-1 text-[9px] text-slate-500 uppercase tracking-wider font-bold">
+          <span>Agency Name</span>
           <span className="text-center">Deployed</span>
           <span className="text-center">Available</span>
+          <span></span>
         </div>
         {agencies.map((row, idx) => (
           <div
-            key={row.agency}
-            className="grid grid-cols-[1fr_80px_80px] gap-2 items-center bg-slate-950/60 p-2.5 rounded-xl border border-slate-800/60"
+            key={idx}
+            className="grid grid-cols-[1fr_70px_70px_32px] gap-2 items-center bg-slate-950/60 p-2 rounded-xl border border-slate-800/60"
           >
-            <span className="text-sm font-semibold text-slate-300">
-              {row.agency}
-            </span>
+            <input
+              type="text"
+              value={row.agency}
+              placeholder="Agency name"
+              onChange={(e) => {
+                const updated = [...agencies];
+                updated[idx].agency = e.target.value;
+                setAgencies(updated);
+              }}
+              className="bg-slate-950 border border-slate-800 text-white rounded-lg p-1.5 text-sm font-semibold focus:ring-2 focus:ring-blue-600 focus:outline-none w-full"
+            />
             <input
               type="number"
               min="0"
               value={row.deployed}
               onChange={(e) => {
-                const val = e.target.value;
                 const updated = [...agencies];
-                updated[idx] = {
-                  ...updated[idx],
-                  deployed: val === "" ? "" : Number(val),
-                };
+                updated[idx].deployed = e.target.value === "" ? "" : Number(e.target.value);
                 setAgencies(updated);
               }}
-              className="bg-slate-950 border border-slate-800 text-white rounded-lg p-1.5 text-center text-sm font-bold focus:ring-2 focus:ring-blue-600 focus:outline-none"
+              className="bg-slate-950 border border-slate-800 text-white rounded-lg p-1.5 text-center text-sm font-bold focus:ring-2 focus:ring-blue-600 focus:outline-none w-full"
             />
             <input
               type="number"
               min="0"
               value={row.available}
               onChange={(e) => {
-                const val = e.target.value;
                 const updated = [...agencies];
-                updated[idx] = {
-                  ...updated[idx],
-                  available: val === "" ? "" : Number(val),
-                };
+                updated[idx].available = e.target.value === "" ? "" : Number(e.target.value);
                 setAgencies(updated);
               }}
-              className="bg-slate-950 border border-slate-800 text-white rounded-lg p-1.5 text-center text-sm font-bold focus:ring-2 focus:ring-blue-600 focus:outline-none"
+              className="bg-slate-950 border border-slate-800 text-white rounded-lg p-1.5 text-center text-sm font-bold focus:ring-2 focus:ring-blue-600 focus:outline-none w-full"
             />
+            <button
+              type="button"
+              onClick={() => handleDeleteAgency(idx, row.id)}
+              className="p-1.5 text-rose-500/50 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors cursor-pointer flex items-center justify-center"
+              title="Remove Agency"
+            >
+              <Trash2 size={16} />
+            </button>
           </div>
         ))}
       </div>
 
-      <Button
-        type="button"
-        onClick={handleSave}
-        disabled={isSaving}
-        className="bg-blue-600 hover:bg-blue-500 text-white font-bold cursor-pointer w-full text-xs py-2.5 rounded-xl transition-all duration-200 hover:scale-[1.01] active:scale-[0.99] shadow-lg shadow-blue-500/25"
-      >
-        <Save size={14} className="mr-1.5" />
-        {isSaving ? "Saving..." : "Save Personnel Updates"}
-      </Button>
+      <div className="flex gap-2">
+        <Button
+          type="button"
+          onClick={handleAddAgency}
+          className="bg-slate-800 hover:bg-slate-700 text-white font-bold cursor-pointer text-xs py-2.5 rounded-xl transition-all w-1/3"
+        >
+          <Plus size={14} className="mr-1.5" />
+          Add Row
+        </Button>
+        <Button
+          type="button"
+          onClick={handleSave}
+          disabled={isSaving}
+          className="bg-blue-600 hover:bg-blue-500 text-white font-bold cursor-pointer flex-1 text-xs py-2.5 rounded-xl transition-all shadow-lg shadow-blue-500/25"
+        >
+          <Save size={14} className="mr-1.5" />
+          {isSaving ? "Saving..." : "Save Personnel Updates"}
+        </Button>
+      </div>
     </div>
   );
 }

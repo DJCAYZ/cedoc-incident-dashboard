@@ -5,7 +5,7 @@ import { DashboardView } from "./dashboard-view";
 import { Session } from "./actions";
 import { RealTimeClock } from "./real-time-clock";
 import dynamic from "next/dynamic";
-import { Map as MapIcon, LayoutDashboard } from "lucide-react";
+import { Map as MapIcon, LayoutDashboard, ExternalLink } from "lucide-react";
 
 const IncidentMap = dynamic(() => import("./incident-map").then(m => m.IncidentMap), { ssr: false });
 
@@ -38,16 +38,26 @@ export function SessionSwitcher({ activeSessions }: { activeSessions: Session[] 
                         <div className="text-blue-100 font-mono text-5xl bg-slate-800/50 px-8 py-6 rounded-2xl border-2 border-slate-700/50 font-bold">
                             <RealTimeClock />
                         </div>
-                        <button 
-                            onClick={() => setViewMode(v => v === "dashboard" ? "map" : "dashboard")}
-                            className="bg-slate-800 hover:bg-slate-700 text-white px-6 py-3 rounded-full font-bold text-lg border border-slate-600 shadow-xl transition-all flex items-center gap-2"
-                        >
-                            {viewMode === "dashboard" ? (
-                                <><MapIcon size={20} className="text-blue-400" /> Switch to Map View</>
-                            ) : (
-                                <><LayoutDashboard size={20} className="text-blue-400" /> Switch to Dashboard</>
-                            )}
-                        </button>
+                        <div className="flex gap-4">
+                            <a 
+                                href="https://sjcrest.netlify.app" 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="bg-slate-800 hover:bg-slate-700 text-white px-6 py-3 rounded-full font-bold text-lg border border-slate-600 shadow-xl transition-all flex items-center gap-2"
+                            >
+                                <ExternalLink size={20} className="text-emerald-400" /> Simulation
+                            </a>
+                            <button 
+                                onClick={() => setViewMode(v => v === "dashboard" ? "map" : "dashboard")}
+                                className="bg-slate-800 hover:bg-slate-700 text-white px-6 py-3 rounded-full font-bold text-lg border border-slate-600 shadow-xl transition-all flex items-center gap-2"
+                            >
+                                {viewMode === "dashboard" ? (
+                                    <><MapIcon size={20} className="text-blue-400" /> Switch to Map View</>
+                                ) : (
+                                    <><LayoutDashboard size={20} className="text-blue-400" /> Switch to Dashboard</>
+                                )}
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
