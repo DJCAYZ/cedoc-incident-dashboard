@@ -15,7 +15,9 @@ import {
     ShieldAlert,
     ChevronDown,
     Activity,
-    Map
+    Map,
+    Sun,
+    Moon
 } from "lucide-react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -27,6 +29,14 @@ function LocationPickerMap({ lat, lng, onChange, onClose }: { lat: number | null
     const leafletMap = useRef<L.Map | null>(null);
     const marker = useRef<L.Marker | null>(null);
     const tempCoords = useRef<{ lat: number, lng: number } | null>(null);
+    const tileLayerRef = useRef<L.TileLayer | null>(null);
+    const [mapTheme, setMapTheme] = useState<'dark' | 'light'>('light');
+
+    useEffect(() => {
+        if (tileLayerRef.current) {
+            tileLayerRef.current.setUrl(`https://{s}.basemaps.cartocdn.com/${mapTheme}_all/{z}/{x}/{y}{r}.png`);
+        }
+    }, [mapTheme]);
 
     useEffect(() => {
         if (!mapRef.current) return;
@@ -40,7 +50,7 @@ function LocationPickerMap({ lat, lng, onChange, onClose }: { lat: number | null
             15
         );
 
-        L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+        tileLayerRef.current = L.tileLayer(`https://{s}.basemaps.cartocdn.com/${mapTheme}_all/{z}/{x}/{y}{r}.png`, {
             maxZoom: 19,
         }).addTo(leafletMap.current);
 
@@ -109,7 +119,7 @@ function LocationPickerMap({ lat, lng, onChange, onClose }: { lat: number | null
 
     return (
         <div className="fixed inset-0 z-[9999] bg-slate-950/90 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-4xl h-[80vh] flex flex-col shadow-2xl overflow-hidden shadow-black/50">
+            <div className="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-4xl h-[60vh] flex flex-col shadow-2xl overflow-hidden shadow-black/50">
                 <div className="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-950">
                     <div>
                         <h3 className="text-white font-bold tracking-wide flex items-center gap-2"><Map size={18} className="text-blue-500" /> Pinpoint Exact Location</h3>
@@ -119,6 +129,16 @@ function LocationPickerMap({ lat, lng, onChange, onClose }: { lat: number | null
                 </div>
                 <div className="flex-1 relative bg-slate-800">
                     <div ref={mapRef} className="absolute inset-0 z-0" />
+                    <div className="absolute top-4 right-4 z-[1000] bg-slate-900/90 backdrop-blur-md border border-slate-700 rounded-xl p-1.5 shadow-2xl flex gap-1 pointer-events-auto">
+                        <button
+                            type="button"
+                            onClick={() => setMapTheme(mapTheme === 'dark' ? 'light' : 'dark')}
+                            className="px-3 py-1.5 flex items-center justify-center rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-all cursor-pointer"
+                            title="Toggle Map Theme"
+                        >
+                            {mapTheme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+                        </button>
+                    </div>
                 </div>
                 <div className="p-4 border-t border-slate-800 bg-slate-950 flex items-center justify-end gap-3">
                     <Button type="button" variant="ghost" className="text-slate-300 hover:text-white" onClick={onClose}>Cancel</Button>

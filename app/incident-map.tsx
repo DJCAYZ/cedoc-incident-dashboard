@@ -71,7 +71,7 @@ export function IncidentMap({ session }: { session: Session }) {
     });
 
     const [statusFilter, setStatusFilter] = useState<"All" | "Active" | "Closed">("Active");
-    const [mapTheme, setMapTheme] = useState<"dark" | "light">("dark");
+    const [mapTheme, setMapTheme] = useState<"dark" | "light">("light");
 
     const filteredIncidents = incidents.filter(inc => {
         if (statusFilter === "Active") return inc.status !== "Closed";
@@ -253,23 +253,26 @@ export function IncidentMap({ session }: { session: Session }) {
 
             const color = severityColor(inc.severity);
 
-            // Outer glow ring + inner fill for visibility and click target
-            const outerRing = L.circleMarker([lat, lng], {
-                radius: 14,
-                fillColor: color,
-                color: "transparent",
-                weight: 0,
-                fillOpacity: 0.15,
-                interactive: false,
-            }).addTo(incidentsLayerRef.current!);
+            const isActive = inc.status !== "Closed";
+            const borderCol = mapTheme === 'dark' ? '#0f172a' : '#ffffff';
+            
+            const html = `
+                <div style="position: relative; width: 16px; height: 16px;">
+                    ${isActive ? `<div class="animate-hud-pulse" style="position: absolute; top: 50%; left: 50%; width: 16px; height: 16px; border-radius: 50%; border: 2px solid ${color}; color: ${color}; pointer-events: none;"></div>` : ''}
+                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 14px; height: 14px; border-radius: 50%; background-color: ${color}; border: 2px solid ${borderCol}; box-shadow: 0 0 10px ${color}; pointer-events: auto;"></div>
+                </div>
+            `;
 
-            const marker = L.circleMarker([lat, lng], {
-                radius: 8,
-                fillColor: color,
-                color: "#ffffff",
-                weight: 2,
-                fillOpacity: 0.95,
-                interactive: true,
+            const customIcon = L.divIcon({
+                html: html,
+                className: '',
+                iconSize: [16, 16],
+                iconAnchor: [8, 8],
+                popupAnchor: [0, -8]
+            });
+
+            const marker = L.marker([lat, lng], {
+                icon: customIcon
             });
 
             const popupHtml = `
