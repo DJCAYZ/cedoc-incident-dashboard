@@ -4,14 +4,14 @@ import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createIncident, updateIncident, InsertIncident, Session, Incident } from "../actions";
 import { Button } from "@/components/ui/button";
-import { 
-    AlertCircle, 
-    MapPin, 
-    FileText, 
-    User, 
-    Users, 
-    Clock, 
-    Info, 
+import {
+    AlertCircle,
+    MapPin,
+    FileText,
+    User,
+    Users,
+    Clock,
+    Info,
     ShieldAlert,
     ChevronDown,
     Activity
@@ -97,7 +97,7 @@ export function IncidentForm({ activeSessions, activeIncidents }: { activeSessio
                 setSeverity(incident.severity);
                 setStatus(incident.status);
                 setBarangay(incident.barangay);
-                
+
                 if (incident.barangay === "Corazon de Jesus" && incident.location.includes(",")) {
                     const parts = incident.location.split(",");
                     setStreet(parts[0].trim());
@@ -106,7 +106,7 @@ export function IncidentForm({ activeSessions, activeIncidents }: { activeSessio
                     setStreet("");
                     setLocation(incident.location);
                 }
-                
+
                 setRespondingUnit(incident.responding_unit || respondingUnits[0]);
                 setCallTaker(incident.call_taker);
                 setResponder(incident.responder);
@@ -116,7 +116,7 @@ export function IncidentForm({ activeSessions, activeIncidents }: { activeSessio
                 setEvacuatedFamilies(incident.evacuated_families);
                 setEvacuatedIndividuals(incident.evacuated_individuals);
                 setDetails(incident.details || "");
-                
+
                 const d = new Date(incident.created_at);
                 d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
                 setDatetime(d.toISOString().slice(0, 16));
@@ -244,7 +244,7 @@ export function IncidentForm({ activeSessions, activeIncidents }: { activeSessio
             await createIncident(incidentData);
             router.refresh();
         }
-        
+
         // Form resets handled by useEffect if we exit edit mode.
         // Otherwise, clear for new entries:
         if (!editId) {
@@ -286,330 +286,329 @@ export function IncidentForm({ activeSessions, activeIncidents }: { activeSessio
                     <p className="text-xs text-slate-600 mt-1 max-w-[280px]">You must establish an active Event Session in the Event Controllers panel to report records.</p>
                 </div>
             ) : (
-            <>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    
-                    {/* Event Select Option */}
-                    <div className="flex flex-col gap-1.5 md:col-span-2">
-                        <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                            <Activity size={12} className="text-blue-400" />
-                            <span>Select Target Event</span>
-                        </label>
-                        <select 
-                            value={sessionId} 
-                            onChange={(e) => setSessionId(Number(e.target.value))} 
-                            className="bg-slate-950 border border-slate-800 text-slate-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-600 focus:border-blue-500 focus:outline-none transition-all cursor-pointer font-medium"
-                        >
-                            {activeSessions.map(s => (
-                                <option key={s.id} value={s.id}>
-                                    {s.name} (ID: #{s.id})
-                                </option>
-                            ))}
-                        </select>
-                    </div>
+                <>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-                    {/* Incident Name */}
-                    <div className="flex flex-col gap-1.5 md:col-span-2">
-                        <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                            <FileText size={12} className="text-blue-400" />
-                            <span>Incident Name / Title</span>
-                        </label>
-                        <input 
-                            type="text" 
-                            required 
-                            value={name} 
-                            onChange={(e) => setName(e.target.value)} 
-                            className="bg-slate-950 border border-slate-800 text-white rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-600 focus:border-blue-500 focus:outline-none transition-all placeholder-slate-600" 
-                            placeholder="e.g. Structure Fire near market, Medical Incident" 
-                        />
-                    </div>
+                        {/* Event Select Option */}
+                        <div className="flex flex-col gap-1.5 md:col-span-2">
+                            <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                                <Activity size={12} className="text-blue-400" />
+                                <span>Select Target Event</span>
+                            </label>
+                            <select
+                                value={sessionId}
+                                onChange={(e) => setSessionId(Number(e.target.value))}
+                                className="bg-slate-950 border border-slate-800 text-slate-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-600 focus:border-blue-500 focus:outline-none transition-all cursor-pointer font-medium"
+                            >
+                                {activeSessions.map(s => (
+                                    <option key={s.id} value={s.id}>
+                                        {s.name} (ID: #{s.id})
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
 
-                    {/* Incident Type */}
-                    <div className="flex flex-col gap-1.5">
-                        <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                            <Info size={12} className="text-blue-400" />
-                            <span>Incident Classification</span>
-                        </label>
-                        <select 
-                            value={type} 
-                            onChange={(e) => setType(e.target.value)} 
-                            className="bg-slate-950 border border-slate-800 text-slate-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-600 focus:border-blue-500 focus:outline-none transition-all cursor-pointer"
-                        >
-                            {incidentTypes.map(t => <option key={t} value={t}>{t}</option>)}
-                        </select>
-                    </div>
+                        {/* Incident Name */}
+                        <div className="flex flex-col gap-1.5 md:col-span-2">
+                            <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                                <FileText size={12} className="text-blue-400" />
+                                <span>Incident Name / Title</span>
+                            </label>
+                            <input
+                                type="text"
+                                required
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                                className="bg-slate-950 border border-slate-800 text-white rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-600 focus:border-blue-500 focus:outline-none transition-all placeholder-slate-600"
+                                placeholder="e.g. Structure Fire near market, Medical Incident"
+                            />
+                        </div>
 
-                    {/* Severity */}
-                    <div className="flex flex-col gap-1.5">
-                        <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                            <AlertCircle size={12} className="text-blue-400" />
-                            <span>Incident Severity</span>
-                        </label>
-                        <select 
-                            value={severity} 
-                            onChange={(e) => setSeverity(e.target.value)} 
-                            className="bg-slate-950 border border-slate-800 text-slate-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-600 focus:border-blue-500 focus:outline-none transition-all cursor-pointer font-semibold"
-                        >
-                            {severities.map(s => <option key={s} value={s}>{s}</option>)}
-                        </select>
-                    </div>
+                        {/* Incident Type */}
+                        <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                                <Info size={12} className="text-blue-400" />
+                                <span>Incident Classification</span>
+                            </label>
+                            <select
+                                value={type}
+                                onChange={(e) => setType(e.target.value)}
+                                className="bg-slate-950 border border-slate-800 text-slate-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-600 focus:border-blue-500 focus:outline-none transition-all cursor-pointer"
+                            >
+                                {incidentTypes.map(t => <option key={t} value={t}>{t}</option>)}
+                            </select>
+                        </div>
 
-                    {/* Status */}
-                    <div className="flex flex-col gap-1.5">
-                        <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                            <Activity size={12} className="text-blue-400" />
-                            <span>Operational Status</span>
-                        </label>
-                        <select 
-                            value={status} 
-                            onChange={(e) => setStatus(e.target.value)} 
-                            className="bg-slate-950 border border-slate-800 text-slate-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-600 focus:border-blue-500 focus:outline-none transition-all cursor-pointer"
-                        >
-                            {statuses.map(s => <option key={s} value={s}>{s}</option>)}
-                        </select>
-                    </div>
+                        {/* Severity */}
+                        <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                                <AlertCircle size={12} className="text-blue-400" />
+                                <span>Incident Severity</span>
+                            </label>
+                            <select
+                                value={severity}
+                                onChange={(e) => setSeverity(e.target.value)}
+                                className="bg-slate-950 border border-slate-800 text-slate-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-600 focus:border-blue-500 focus:outline-none transition-all cursor-pointer font-semibold"
+                            >
+                                {severities.map(s => <option key={s} value={s}>{s}</option>)}
+                            </select>
+                        </div>
 
-                    {/* Responding Unit */}
-                    <div className="flex flex-col gap-1.5">
-                        <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                            <Users size={12} className="text-blue-400" />
-                            <span>Responding Dispatch Agency</span>
-                        </label>
-                        <select 
-                            value={respondingUnit} 
-                            onChange={(e) => setRespondingUnit(e.target.value)} 
-                            className="bg-slate-950 border border-slate-800 text-slate-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-600 focus:border-blue-500 focus:outline-none transition-all cursor-pointer"
-                        >
-                            {respondingUnits.map(r => <option key={r} value={r}>{r}</option>)}
-                        </select>
-                    </div>
+                        {/* Status */}
+                        <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                                <Activity size={12} className="text-blue-400" />
+                                <span>Operational Status</span>
+                            </label>
+                            <select
+                                value={status}
+                                onChange={(e) => setStatus(e.target.value)}
+                                className="bg-slate-950 border border-slate-800 text-slate-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-600 focus:border-blue-500 focus:outline-none transition-all cursor-pointer"
+                            >
+                                {statuses.map(s => <option key={s} value={s}>{s}</option>)}
+                            </select>
+                        </div>
 
-                    {/* Call Taker */}
-                    <div className="flex flex-col gap-1.5">
-                        <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                            <User size={12} className="text-blue-400" />
-                            <span>Logging Dispatcher</span>
-                        </label>
-                        <input 
-                            type="text" 
-                            required 
-                            value={callTaker} 
-                            onChange={(e) => setCallTaker(e.target.value)} 
-                            className="bg-slate-950 border border-slate-800 text-white rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-600 focus:border-blue-500 focus:outline-none transition-all placeholder-slate-600" 
-                            placeholder="Operator Name/Code" 
-                        />
-                    </div>
+                        {/* Responding Unit */}
+                        <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                                <Users size={12} className="text-blue-400" />
+                                <span>Responding Dispatch Agency</span>
+                            </label>
+                            <select
+                                value={respondingUnit}
+                                onChange={(e) => setRespondingUnit(e.target.value)}
+                                className="bg-slate-950 border border-slate-800 text-slate-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-600 focus:border-blue-500 focus:outline-none transition-all cursor-pointer"
+                            >
+                                {respondingUnits.map(r => <option key={r} value={r}>{r}</option>)}
+                            </select>
+                        </div>
 
-                    {/* Responder */}
-                    <div className="flex flex-col gap-1.5">
-                        <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                            <Users size={12} className="text-blue-400" />
-                            <span>Assigned Field Responder</span>
-                        </label>
-                        <input 
-                            type="text" 
-                            required
-                            value={responder} 
-                            onChange={(e) => setResponder(e.target.value)} 
-                            className="bg-slate-950 border border-slate-800 text-white rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-600 focus:border-blue-500 focus:outline-none transition-all placeholder-slate-600" 
-                            placeholder="e.g. BFP Truck #3, Medic Alpha" 
-                        />
-                    </div>
+                        {/* Call Taker */}
+                        <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                                <User size={12} className="text-blue-400" />
+                                <span>Logging Dispatcher</span>
+                            </label>
+                            <input
+                                type="text"
+                                required
+                                value={callTaker}
+                                onChange={(e) => setCallTaker(e.target.value)}
+                                className="bg-slate-950 border border-slate-800 text-white rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-600 focus:border-blue-500 focus:outline-none transition-all placeholder-slate-600"
+                                placeholder="Operator Name/Code"
+                            />
+                        </div>
 
-                    {/* Location Details */}
-                    <div className="flex flex-col gap-1.5 md:col-span-2">
-                        <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                            <MapPin size={12} className="text-blue-400" />
-                            <span>Specific Location / Landmarks</span>
-                        </label>
-                        <input 
-                            type="text" 
-                            required 
-                            value={location} 
-                            onChange={(e) => setLocation(e.target.value)} 
-                            className="bg-slate-950 border border-slate-800 text-white rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-600 focus:border-blue-500 focus:outline-none transition-all placeholder-slate-600" 
-                            placeholder="e.g. Near corner of Pinaglabanan and F. Roman St." 
-                        />
-                    </div>
+                        {/* Responder */}
+                        <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                                <Users size={12} className="text-blue-400" />
+                                <span>Assigned Field Responder</span>
+                            </label>
+                            <input
+                                type="text"
+                                required
+                                value={responder}
+                                onChange={(e) => setResponder(e.target.value)}
+                                className="bg-slate-950 border border-slate-800 text-white rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-600 focus:border-blue-500 focus:outline-none transition-all placeholder-slate-600"
+                                placeholder="e.g. BFP Truck #3, Medic Alpha"
+                            />
+                        </div>
 
-                    {/* Barangay Picker */}
-                    <div className="flex flex-col gap-1.5 relative md:col-span-2">
-                        <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                            <MapPin size={12} className="text-blue-400" />
-                            <span>Assigned Barangay Area</span>
-                        </label>
-                        <input
-                            type="text"
-                            required
-                            value={barangay}
-                            onChange={(e) => setBarangay(e.target.value)}
-                            onFocus={() => setIsBarangayFocused(true)}
-                            onBlur={handleBarangayBlur}
-                            className={`bg-slate-950 border text-white rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-600 focus:border-blue-500 focus:outline-none transition-all placeholder-slate-600 w-full ${
-                                !isValidBarangay ? "border-rose-500 focus:ring-rose-500 focus:border-rose-500" : "border-slate-800"
-                            }`}
-                            placeholder="Type to search barangay..."
-                        />
-
-                        {isBarangayFocused && (
-                            <div className="absolute z-50 left-0 right-0 top-[calc(100%+6px)] max-h-56 overflow-y-auto bg-slate-900 border border-slate-800 rounded-xl shadow-2xl py-1">
-                                {[1, 2].map(districtNum => {
-                                    const districtBarangays = filteredBarangays.filter(b => b.district === districtNum);
-                                    if (districtBarangays.length === 0) return null;
-                                    return (
-                                        <div key={districtNum}>
-                                            <div className="px-3 py-1.5 text-[9px] font-bold text-slate-500 bg-slate-950 border-b border-slate-800/80 uppercase tracking-widest sticky top-0">
-                                                District {districtNum}
-                                            </div>
-                                            {districtBarangays.map(b => (
-                                                <div
-                                                    key={b.name}
-                                                    onMouseDown={() => setBarangay(b.name)}
-                                                    className="px-4 py-2 hover:bg-blue-600/20 cursor-pointer text-sm text-slate-300 transition-all flex items-center justify-between"
-                                                >
-                                                    <span>{b.name}</span>
-                                                    {barangay.toLowerCase() === b.name.toLowerCase() && (
-                                                        <span className="text-blue-400 text-xs">✓</span>
-                                                    )}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    );
-                                })}
-                                {filteredBarangays.length === 0 && (
-                                    <div className="px-4 py-3 text-sm text-slate-500 italic text-center">
-                                        No matching barangays found
-                                    </div>
-                                )}
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Street Select for Corazon de Jesus */}
-                    {barangay === "Corazon de Jesus" && (
+                        {/* Location Details */}
                         <div className="flex flex-col gap-1.5 md:col-span-2">
                             <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
                                 <MapPin size={12} className="text-blue-400" />
-                                <span>Specific Street (Corazon de Jesus)</span>
+                                <span>Specific Location / Landmarks</span>
                             </label>
-                            <select 
-                                value={street} 
-                                onChange={(e) => setStreet(e.target.value)} 
-                                className="bg-slate-950 border border-slate-800 text-slate-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-600 focus:border-blue-500 focus:outline-none transition-all cursor-pointer"
-                            >
-                                <option value="">Select street...</option>
-                                {corazonDeJesusStreets.map(s => <option key={s} value={s}>{s}</option>)}
-                            </select>
+                            <input
+                                type="text"
+                                required
+                                value={location}
+                                onChange={(e) => setLocation(e.target.value)}
+                                className="bg-slate-950 border border-slate-800 text-white rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-600 focus:border-blue-500 focus:outline-none transition-all placeholder-slate-600"
+                                placeholder="e.g. Near corner of Pinaglabanan and F. Roman St."
+                            />
                         </div>
-                    )}
 
-                    {/* Timestamp */}
-                    <div className="flex flex-col gap-1.5 md:col-span-2">
-                        <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                            <Clock size={12} className="text-blue-400" />
-                            <span>Occurred Timestamp</span>
-                        </label>
-                        <input 
-                            type="datetime-local" 
-                            required 
-                            value={datetime} 
-                            onChange={(e) => { setDatetime(e.target.value); setIsDatetimeEdited(true); }} 
-                            className="bg-slate-950 border border-slate-800 text-white rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-600 focus:border-blue-500 focus:outline-none transition-all cursor-text" 
-                        />
+                        {/* Barangay Picker */}
+                        <div className="flex flex-col gap-1.5 relative md:col-span-2">
+                            <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                                <MapPin size={12} className="text-blue-400" />
+                                <span>Assigned Barangay Area</span>
+                            </label>
+                            <input
+                                type="text"
+                                required
+                                value={barangay}
+                                onChange={(e) => setBarangay(e.target.value)}
+                                onFocus={() => setIsBarangayFocused(true)}
+                                onBlur={handleBarangayBlur}
+                                className={`bg-slate-950 border text-white rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-600 focus:border-blue-500 focus:outline-none transition-all placeholder-slate-600 w-full ${!isValidBarangay ? "border-rose-500 focus:ring-rose-500 focus:border-rose-500" : "border-slate-800"
+                                    }`}
+                                placeholder="Type to search barangay..."
+                            />
+
+                            {isBarangayFocused && (
+                                <div className="absolute z-50 left-0 right-0 top-[calc(100%+6px)] max-h-56 overflow-y-auto bg-slate-900 border border-slate-800 rounded-xl shadow-2xl py-1">
+                                    {[1, 2].map(districtNum => {
+                                        const districtBarangays = filteredBarangays.filter(b => b.district === districtNum);
+                                        if (districtBarangays.length === 0) return null;
+                                        return (
+                                            <div key={districtNum}>
+                                                <div className="px-3 py-1.5 text-[9px] font-bold text-slate-500 bg-slate-950 border-b border-slate-800/80 uppercase tracking-widest sticky top-0">
+                                                    District {districtNum}
+                                                </div>
+                                                {districtBarangays.map(b => (
+                                                    <div
+                                                        key={b.name}
+                                                        onMouseDown={() => setBarangay(b.name)}
+                                                        className="px-4 py-2 hover:bg-blue-600/20 cursor-pointer text-sm text-slate-300 transition-all flex items-center justify-between"
+                                                    >
+                                                        <span>{b.name}</span>
+                                                        {barangay.toLowerCase() === b.name.toLowerCase() && (
+                                                            <span className="text-blue-400 text-xs">✓</span>
+                                                        )}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        );
+                                    })}
+                                    {filteredBarangays.length === 0 && (
+                                        <div className="px-4 py-3 text-sm text-slate-500 italic text-center">
+                                            No matching barangays found
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Street Select for Corazon de Jesus */}
+                        {barangay === "Corazon de Jesus" && (
+                            <div className="flex flex-col gap-1.5 md:col-span-2">
+                                <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                                    <MapPin size={12} className="text-blue-400" />
+                                    <span>Specific Street (Corazon de Jesus)</span>
+                                </label>
+                                <select
+                                    value={street}
+                                    onChange={(e) => setStreet(e.target.value)}
+                                    className="bg-slate-950 border border-slate-800 text-slate-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-600 focus:border-blue-500 focus:outline-none transition-all cursor-pointer"
+                                >
+                                    <option value="">Select street...</option>
+                                    {corazonDeJesusStreets.map(s => <option key={s} value={s}>{s}</option>)}
+                                </select>
+                            </div>
+                        )}
+
+                        {/* Timestamp */}
+                        <div className="flex flex-col gap-1.5 md:col-span-2">
+                            <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                                <Clock size={12} className="text-blue-400" />
+                                <span>Occurred Timestamp</span>
+                            </label>
+                            <input
+                                type="datetime-local"
+                                required
+                                value={datetime}
+                                onChange={(e) => { setDatetime(e.target.value); setIsDatetimeEdited(true); }}
+                                className="bg-slate-950 border border-slate-800 text-white rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-600 focus:border-blue-500 focus:outline-none transition-all cursor-text"
+                            />
+                        </div>
+
+                        {/* Incident Logs/Logs Description */}
+                        <div className="flex flex-col gap-1.5 md:col-span-2">
+                            <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                                <FileText size={12} className="text-blue-400" />
+                                <span>Detailed Logs & Updates</span>
+                            </label>
+                            <textarea
+                                value={details}
+                                onChange={(e) => setDetails(e.target.value)}
+                                rows={3}
+                                className="bg-slate-950 border border-slate-800 text-white rounded-xl p-3 text-sm focus:ring-2 focus:ring-blue-600 focus:border-blue-500 focus:outline-none transition-all placeholder-slate-600 resize-none"
+                                placeholder="Enter any initial logs, emergency response actions, and updates..."
+                            />
+                        </div>
                     </div>
 
-                    {/* Incident Logs/Logs Description */}
-                    <div className="flex flex-col gap-1.5 md:col-span-2">
-                        <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                            <FileText size={12} className="text-blue-400" />
-                            <span>Detailed Logs & Updates</span>
-                        </label>
-                        <textarea 
-                            value={details} 
-                            onChange={(e) => setDetails(e.target.value)} 
-                            rows={3} 
-                            className="bg-slate-950 border border-slate-800 text-white rounded-xl p-3 text-sm focus:ring-2 focus:ring-blue-600 focus:border-blue-500 focus:outline-none transition-all placeholder-slate-600 resize-none" 
-                            placeholder="Enter any initial logs, emergency response actions, and updates..." 
-                        />
-                    </div>
-                </div>
+                    <div className="border-t border-slate-800 my-2 pt-4">
+                        <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Casualty & Evacuation Metrics</h3>
 
-                <div className="border-t border-slate-800 my-2 pt-4">
-                    <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Casualty & Evacuation Metrics</h3>
-                    
-                    <div className="grid grid-cols-3 gap-3">
-                        <div className="flex flex-col gap-1 bg-slate-950/45 p-2 border border-slate-800 rounded-xl">
-                            <label className="text-[10px] font-bold text-rose-400 uppercase tracking-wide">Dead</label>
-                            <input 
-                                type="number" 
-                                min="0" 
-                                value={casualtiesDead} 
-                                onChange={(e) => setCasualtiesDead(e.target.value === "" ? "" : Number(e.target.value))} 
-                                className="bg-slate-950 border border-slate-800/80 text-white rounded-lg p-1.5 text-center text-sm font-bold focus:ring-2 focus:ring-rose-500 focus:outline-none w-full min-w-[60px]" 
-                            />
-                        </div>
-                        <div className="flex flex-col gap-1 bg-slate-950/45 p-2 border border-slate-800 rounded-xl">
-                            <label className="text-[10px] font-bold text-orange-400 uppercase tracking-wide">Injured</label>
-                            <input 
-                                type="number" 
-                                min="0" 
-                                value={casualtiesInjured} 
-                                onChange={(e) => setCasualtiesInjured(e.target.value === "" ? "" : Number(e.target.value))} 
-                                className="bg-slate-950 border border-slate-800/80 text-white rounded-lg p-1.5 text-center text-sm font-bold focus:ring-2 focus:ring-orange-500 focus:outline-none w-full min-w-[60px]" 
-                            />
-                        </div>
-                        <div className="flex flex-col gap-1 bg-slate-950/45 p-2 border border-slate-800 rounded-xl">
-                            <label className="text-[10px] font-bold text-yellow-400 uppercase tracking-wide">Missing</label>
-                            <input 
-                                type="number" 
-                                min="0" 
-                                value={casualtiesMissing} 
-                                onChange={(e) => setCasualtiesMissing(e.target.value === "" ? "" : Number(e.target.value))} 
-                                className="bg-slate-950 border border-slate-800/80 text-white rounded-lg p-1.5 text-center text-sm font-bold focus:ring-2 focus:ring-yellow-500 focus:outline-none w-full min-w-[60px]" 
-                            />
-                        </div>
-                        
-                        <div className="flex flex-col gap-1 bg-slate-950/45 p-2 border border-slate-800 rounded-xl col-span-1">
-                            <label className="text-[10px] font-bold text-cyan-400 uppercase tracking-wide">Evac Families</label>
-                            <input 
-                                type="number" 
-                                min="0" 
-                                value={evacuatedFamilies} 
-                                onChange={(e) => setEvacuatedFamilies(e.target.value === "" ? "" : Number(e.target.value))} 
-                                className="bg-slate-950 border border-slate-800/80 text-white rounded-lg p-1.5 text-center text-sm font-bold focus:ring-2 focus:ring-cyan-500 focus:outline-none w-full min-w-[60px]" 
-                            />
-                        </div>
-                        <div className="flex flex-col gap-1 bg-slate-950/45 p-2 border border-slate-800 rounded-xl col-span-2">
-                            <label className="text-[10px] font-bold text-cyan-400 uppercase tracking-wide">Evac Individuals</label>
-                            <input 
-                                type="number" 
-                                min="0" 
-                                value={evacuatedIndividuals} 
-                                onChange={(e) => setEvacuatedIndividuals(e.target.value === "" ? "" : Number(e.target.value))} 
-                                className="bg-slate-950 border border-slate-800/80 text-white rounded-lg p-1.5 text-center text-sm font-bold focus:ring-2 focus:ring-cyan-500 focus:outline-none w-full min-w-[60px]" 
-                            />
+                        <div className="grid grid-cols-3 gap-3">
+                            <div className="flex flex-col gap-1 bg-slate-950/45 p-2 border border-slate-800 rounded-xl">
+                                <label className="text-[10px] font-bold text-rose-400 uppercase tracking-wide">Dead</label>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    value={casualtiesDead}
+                                    onChange={(e) => setCasualtiesDead(e.target.value === "" ? "" : Number(e.target.value))}
+                                    className="bg-slate-950 border border-slate-800/80 text-white rounded-lg p-1.5 text-center text-sm font-bold focus:ring-2 focus:ring-rose-500 focus:outline-none w-full min-w-[60px]"
+                                />
+                            </div>
+                            <div className="flex flex-col gap-1 bg-slate-950/45 p-2 border border-slate-800 rounded-xl">
+                                <label className="text-[10px] font-bold text-orange-400 uppercase tracking-wide">Injured</label>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    value={casualtiesInjured}
+                                    onChange={(e) => setCasualtiesInjured(e.target.value === "" ? "" : Number(e.target.value))}
+                                    className="bg-slate-950 border border-slate-800/80 text-white rounded-lg p-1.5 text-center text-sm font-bold focus:ring-2 focus:ring-orange-500 focus:outline-none w-full min-w-[60px]"
+                                />
+                            </div>
+                            <div className="flex flex-col gap-1 bg-slate-950/45 p-2 border border-slate-800 rounded-xl">
+                                <label className="text-[10px] font-bold text-yellow-400 uppercase tracking-wide">Missing</label>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    value={casualtiesMissing}
+                                    onChange={(e) => setCasualtiesMissing(e.target.value === "" ? "" : Number(e.target.value))}
+                                    className="bg-slate-950 border border-slate-800/80 text-white rounded-lg p-1.5 text-center text-sm font-bold focus:ring-2 focus:ring-yellow-500 focus:outline-none w-full min-w-[60px]"
+                                />
+                            </div>
+
+                            <div className="flex flex-col gap-1 bg-slate-950/45 p-2 border border-slate-800 rounded-xl col-span-1">
+                                <label className="text-[10px] font-bold text-cyan-400 uppercase tracking-wide">Evac Families</label>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    value={evacuatedFamilies}
+                                    onChange={(e) => setEvacuatedFamilies(e.target.value === "" ? "" : Number(e.target.value))}
+                                    className="bg-slate-950 border border-slate-800/80 text-white rounded-lg p-1.5 text-center text-sm font-bold focus:ring-2 focus:ring-cyan-500 focus:outline-none w-full min-w-[60px]"
+                                />
+                            </div>
+                            <div className="flex flex-col gap-1 bg-slate-950/45 p-2 border border-slate-800 rounded-xl col-span-2">
+                                <label className="text-[10px] font-bold text-cyan-400 uppercase tracking-wide">Evac Individuals</label>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    value={evacuatedIndividuals}
+                                    onChange={(e) => setEvacuatedIndividuals(e.target.value === "" ? "" : Number(e.target.value))}
+                                    className="bg-slate-950 border border-slate-800/80 text-white rounded-lg p-1.5 text-center text-sm font-bold focus:ring-2 focus:ring-cyan-500 focus:outline-none w-full min-w-[60px]"
+                                />
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div className="flex gap-3 mt-2">
-                    <Button 
-                        type="submit" 
-                        className="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-bold h-auto py-3 rounded-xl transition-all duration-200 hover:scale-[1.01] active:scale-[0.99] cursor-pointer shadow-lg shadow-blue-500/25"
-                    >
-                        {editId ? "Save Incident Updates" : "Submit Incident Record"}
-                    </Button>
-                    {editId && (
-                        <Button 
-                            type="button" 
-                            onClick={() => router.push("/admin")}
-                            className="bg-slate-700 hover:bg-slate-600 text-white font-bold h-auto py-3 px-6 rounded-xl transition-all cursor-pointer"
+                    <div className="flex gap-3 mt-2">
+                        <Button
+                            type="submit"
+                            className="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-bold h-auto py-3 rounded-xl transition-all duration-200 hover:scale-[1.01] active:scale-[0.99] cursor-pointer shadow-lg shadow-blue-500/25"
                         >
-                            Cancel Edit
+                            {editId ? "Save Incident Updates" : "Submit Incident Record"}
                         </Button>
-                    )}
-                </div>
-            </>
+                        {editId && (
+                            <Button
+                                type="button"
+                                onClick={() => router.push("/admin")}
+                                className="bg-slate-700 hover:bg-slate-600 text-white font-bold h-auto py-3 px-6 rounded-xl transition-all cursor-pointer"
+                            >
+                                Cancel Edit
+                            </Button>
+                        )}
+                    </div>
+                </>
             )}
         </form>
     );
