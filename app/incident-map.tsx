@@ -6,6 +6,7 @@ import "leaflet/dist/leaflet.css";
 import { useQuery } from "@tanstack/react-query";
 import { getIncidents, Session } from "./actions";
 import dayjs from "dayjs";
+import { Sun, Moon } from "lucide-react";
 
 // Static map data imports
 import streetsDataRaw from "../public/map/streets.json";
@@ -59,9 +60,9 @@ const severityColor = (severity: string) => {
 export function IncidentMap({ session }: { session: Session }) {
     const mapRef = useRef<HTMLDivElement>(null);
     const mapInstance = useRef<L.Map | null>(null);
-    // Separate refs for each layer — no property-on-instance hacks
     const choroplethLayerRef = useRef<L.LayerGroup | null>(null);
     const incidentsLayerRef = useRef<L.LayerGroup | null>(null);
+    const tileLayerRef = useRef<L.TileLayer | null>(null);
 
     const { data: incidents = [] } = useQuery({
         queryKey: ["incidents", session.id],
@@ -70,6 +71,7 @@ export function IncidentMap({ session }: { session: Session }) {
     });
 
     const [statusFilter, setStatusFilter] = useState<"All" | "Active" | "Closed">("Active");
+    const [mapTheme, setMapTheme] = useState<"dark" | "light">("dark");
 
     const filteredIncidents = incidents.filter(inc => {
         if (statusFilter === "Active") return inc.status !== "Closed";
@@ -84,7 +86,7 @@ export function IncidentMap({ session }: { session: Session }) {
         const map = L.map(mapRef.current, { zoomControl: true }).setView([14.602, 121.035], 14);
         mapInstance.current = map;
 
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        tileLayerRef.current = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
             subdomains: 'abcd',
             maxZoom: 20
@@ -122,8 +124,19 @@ export function IncidentMap({ session }: { session: Session }) {
             mapInstance.current = null;
             choroplethLayerRef.current = null;
             incidentsLayerRef.current = null;
+            tileLayerRef.current = null;
         };
     }, []);
+
+    // Theme toggle effect
+    useEffect(() => {
+        if (tileLayerRef.current) {
+            const url = mapTheme === 'dark' 
+                ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+                : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+            tileLayerRef.current.setUrl(url);
+        }
+    }, [mapTheme]);
 
     // Reactive: update choropleth + markers when incidents or filter changes
     useEffect(() => {
@@ -158,9 +171,15 @@ export function IncidentMap({ session }: { session: Session }) {
                 onEachFeature: (feature, layer) => {
                     const name = feature?.properties?.name;
                     const count = counts[name] || 0;
+                    
+                    const bg = mapTheme === 'dark' ? 'rgba(15, 23, 42, 0.5)' : 'rgba(255, 255, 255, 0.6)';
+                    const border = mapTheme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)';
+                    const color = mapTheme === 'dark' ? '#f8fafc' : '#0f172a';
+                    const subColor = mapTheme === 'dark' ? '#94a3b8' : '#64748b';
+                    
                     layer.bindTooltip(
-                        `<div style="font:bold 13px/1.4 'Fira Code',monospace;color:#f1f5f9;background:#0f172a;border:1px solid #334155;padding:6px 10px;border-radius:8px;">${name}<br/><span style="color:#94a3b8;font-size:11px">${count} incident${count !== 1 ? 's' : ''}</span></div>`,
-                        { direction: "center", permanent: false, opacity: 1, className: "leaflet-tooltip-clean" }
+                        `<div style="font-family: 'Inter', sans-serif; font-weight: 600; font-size: 11px; padding: 4px 10px; border-radius: 20px; background: ${bg}; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid ${border}; color: ${color}; box-shadow: 0 4px 12px rgba(0,0,0,0.1); text-align: center;">${name}<br/><span style="font-size:9px; font-weight: 500; color:${subColor}; margin-top: 2px; display: block;">${count} incident${count !== 1 ? 's' : ''}</span></div>`,
+                        { direction: "center", permanent: true, opacity: 1, className: "bg-transparent border-none shadow-none p-0" }
                     );
                 }
             }).addTo(choroplethLayerRef.current);
@@ -281,7 +300,7 @@ export function IncidentMap({ session }: { session: Session }) {
             marker.addTo(incidentsLayerRef.current!);
         });
 
-    }, [filteredIncidents]);
+    }, [filteredIncidents, mapTheme]);
 
     return (
         <div className="flex-1 w-full h-full bg-slate-950 rounded-2xl border border-slate-700 overflow-hidden relative shadow-2xl min-h-[400px]">
@@ -319,6 +338,17 @@ export function IncidentMap({ session }: { session: Session }) {
                         {status}
                     </button>
                 ))}
+            </div>
+
+            {/* Theme Toggle */}
+            <div className="absolute top-20 right-6 z-[1000] bg-slate-900/90 backdrop-blur-md border border-slate-700 rounded-xl p-1.5 shadow-2xl flex gap-1">
+                <button
+                    onClick={() => setMapTheme(mapTheme === 'dark' ? 'light' : 'dark')}
+                    className="px-3 py-1.5 flex items-center justify-center rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-all cursor-pointer"
+                    title="Toggle Map Theme"
+                >
+                    {mapTheme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+                </button>
             </div>
 
             {/* Incident count badge */}

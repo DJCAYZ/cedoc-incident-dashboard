@@ -6,7 +6,7 @@ import { upsertPersonnel, getPersonnel, Personnel, Session } from "../actions";
 import { Button } from "@/components/ui/button";
 import { Shield, Save, Users } from "lucide-react";
 
-const DEFAULT_AGENCIES = ["BFP", "PNP", "CDRRMO", "EMS", "Barangay", "Other"];
+const DEFAULT_AGENCIES = ["BFP", "PNP", "CDRRMD", "EMS", "Barangay", "Other"];
 
 interface AgencyRow {
   agency: string;

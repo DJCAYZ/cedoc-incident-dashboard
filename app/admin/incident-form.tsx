@@ -54,11 +54,22 @@ function LocationPickerMap({ lat, lng, onChange, onClose }: { lat: number | null
 
         // Add San Juan Boundary Layer
         L.geoJSON(sanjuanGeoRaw as any, {
+            filter: (feature) => feature?.geometry?.type === "Polygon" || feature?.geometry?.type === "MultiPolygon",
             style: {
-                color: "#94a3b8",
-                weight: 2,
-                opacity: 0.5,
-                fillColor: "transparent"
+                color: "#475569",
+                weight: 1.5,
+                opacity: 0.6,
+                fillColor: "#0f172a",
+                fillOpacity: 0.3
+            },
+            onEachFeature: (feature, layer) => {
+                const name = feature?.properties?.name;
+                if (name) {
+                    layer.bindTooltip(
+                        `<div style="font-family: 'Inter', sans-serif; font-weight: 600; font-size: 11px; padding: 4px 10px; border-radius: 20px; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.1); color: #f8fafc; box-shadow: 0 4px 12px rgba(0,0,0,0.1); text-align: center;">${name}</div>`,
+                        { direction: "center", permanent: true, opacity: 1, className: "bg-transparent border-none shadow-none p-0" }
+                    );
+                }
             }
         }).addTo(leafletMap.current);
 
@@ -127,7 +138,7 @@ const incidentTypes = [
 
 const severities = ["🔴 Critical", "🟠 High", "🟡 Moderate", "🟢 Normal"];
 const statuses = ["Reported", "Validated", "Response Ongoing", "Monitoring"];
-const respondingUnits = ["None", "BFP", "PNP", "EMS", "CDRRMO"];
+const respondingUnits = ["None", "BFP", "PNP", "EMS", "CDRRMD"];
 
 const barangays = [
     // District 1

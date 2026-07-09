@@ -128,3 +128,10 @@
     @apply font-sans;
   }
 }
+
+/* Override Leaflet's default tooltip styling */
+.leaflet-tooltip.bg-transparent {
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}

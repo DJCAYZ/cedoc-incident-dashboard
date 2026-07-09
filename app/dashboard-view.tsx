@@ -473,7 +473,7 @@ export function DashboardView({ session }: { session: Session }) {
                         <h2 className="text-2xl font-bold mb-4 uppercase tracking-wider text-slate-300 border-b border-slate-600 pb-2">Emergency Contacts</h2>
                         <div className="space-y-6">
                             <div>
-                                <p className="text-2xl font-bold text-slate-400 mb-1">CDRRMO / EMS</p>
+                                <p className="text-2xl font-bold text-slate-400 mb-1">CDRRMD / EMS</p>
                                 <p className="text-5xl font-black text-white tracking-tighter">137-135</p>
                             </div>
                             <div>
