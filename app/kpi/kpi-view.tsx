@@ -1,6 +1,7 @@
 "use client";
 
 import { Incident, Session, getEventReportData } from "../actions";
+import { generateWordReport } from "../ai-actions";
 import { useRouter } from "next/navigation";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, AreaChart, Area } from "recharts";
 import dayjs from "dayjs";
@@ -23,6 +24,7 @@ export function KpiView({
     const [range, setRange] = useState(initialRange);
     const [sessionId, setSessionId] = useState<number | undefined>(initialSessionId);
     const [isDownloading, setIsDownloading] = useState(false);
+    const [isGeneratingAI, setIsGeneratingAI] = useState(false);
 
     const handleRangeChange = (newRange: string) => {
         setRange(newRange);
@@ -118,6 +120,34 @@ export function KpiView({
         }
     };
 
+    const handleAiDownload = async () => {
+        if (!sessionId) return;
+        setIsGeneratingAI(true);
+        try {
+            const base64 = await generateWordReport(sessionId);
+            
+            const byteCharacters = atob(base64);
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            const blob = new Blob([byteArray], { type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
+            
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `CEDOC_AI_Report_${dayjs().format('YYYY-MM-DD')}.docx`;
+            a.click();
+            URL.revokeObjectURL(url);
+        } catch (error: any) {
+            console.error("AI report failed", error);
+            alert(error.message || "Failed to generate AI report.");
+        } finally {
+            setIsGeneratingAI(false);
+        }
+    };
+
     // --- Data Aggregation ---
 
     // 1. Top Responders
@@ -209,14 +239,24 @@ export function KpiView({
                 </select>
 
                 {sessionId && (
-                    <button 
-                        onClick={handleDownloadReport} 
-                        disabled={isDownloading}
-                        className="ml-auto flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-md font-bold transition-all disabled:opacity-50"
-                    >
-                        <Download size={18} />
-                        {isDownloading ? "Generating..." : "Download Final Report"}
-                    </button>
+                    <div className="ml-auto flex gap-2">
+                        <button 
+                            onClick={handleAiDownload} 
+                            disabled={isGeneratingAI || isDownloading}
+                            className="flex items-center gap-2 bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-md font-bold transition-all disabled:opacity-50 shadow-lg shadow-purple-500/20"
+                        >
+                            <Download size={18} />
+                            {isGeneratingAI ? "AI is writing..." : "AI Word Report"}
+                        </button>
+                        <button 
+                            onClick={handleDownloadReport} 
+                            disabled={isDownloading || isGeneratingAI}
+                            className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-md font-bold transition-all disabled:opacity-50"
+                        >
+                            <Download size={18} />
+                            {isDownloading ? "Generating..." : "CSV Report"}
+                        </button>
+                    </div>
                 )}
             </div>
 
