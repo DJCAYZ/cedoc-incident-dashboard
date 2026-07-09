@@ -249,10 +249,12 @@ export function DashboardView({ session }: { session: Session }) {
                                 </h2>
                                 <div className="space-y-4">
                                     {waterLevels.map(w => {
+                                        const m = w.level_meters;
+                                        let levelStatus = "Normal";
                                         let statusColor = "text-emerald-400";
-                                        if (w.status === "Rising") { statusColor = "text-yellow-400"; }
-                                        if (w.status === "Critical") { statusColor = "text-orange-400"; }
-                                        if (w.status === "Overflow") { statusColor = "text-red-400"; }
+                                        if (m >= 13) { levelStatus = "Critical"; statusColor = "text-red-400"; }
+                                        else if (m >= 12) { levelStatus = "Alert"; statusColor = "text-orange-400"; }
+                                        else if (m >= 11) { levelStatus = "Alarm"; statusColor = "text-yellow-400"; }
 
                                         return (
                                             <div key={w.id} className="flex flex-col bg-slate-900/50 p-3.5 rounded-lg border border-slate-700/50 gap-2">
@@ -267,7 +269,7 @@ export function DashboardView({ session }: { session: Session }) {
                                                     </div>
                                                     <div className="flex flex-col items-end">
                                                         <span className={`text-2xl font-black ${statusColor}`}>{w.level_meters.toFixed(1)}</span>
-                                                        <span className={`text-xs uppercase tracking-widest font-bold ${statusColor}`}>{w.status}</span>
+                                                        <span className={`text-xs uppercase tracking-widest font-bold ${statusColor} bg-slate-950 px-2 py-0.5 rounded border border-slate-800 mt-1`}>{levelStatus}</span>
                                                     </div>
                                                 </div>
                                             </div>

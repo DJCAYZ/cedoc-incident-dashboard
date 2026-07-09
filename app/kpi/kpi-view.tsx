@@ -57,9 +57,10 @@ export function KpiView({
             csv += `Closed At,${data.session.closed_at ? dayjs(data.session.closed_at).format("MMM D YYYY HH:mm") : 'Ongoing'}\n\n`;
 
             csv += `--- INCIDENT LOGS ---\n`;
-            csv += `Date,ID,Name,Type,Barangay,Location,Severity,Status,Call Taker,Responder,Dead,Injured,Missing,Evac Families,Evac Individuals,Details\n`;
+            csv += `Date,ID,Name,Type,Barangay,Location,Latitude,Longitude,Severity,Status,Responding Unit,Call Taker,Responder,Caller Name,Caller Phone,Caller Age,Resolved At,Dead,Injured,Missing,Evac Families,Evac Individuals,Details\n`;
             data.incidents.forEach(inc => {
-                csv += `"${dayjs(inc.created_at).format("MMM D YYYY HH:mm")}","${inc.id}","${inc.name}","${inc.type}","${inc.barangay}","${inc.location}","${inc.severity}","${inc.status}","${inc.call_taker}","${inc.responder}","${inc.casualties_dead}","${inc.casualties_injured}","${inc.casualties_missing}","${inc.evacuated_families}","${inc.evacuated_individuals}","${inc.details.replace(/"/g, '""')}"\n`;
+                const resolvedAt = inc.resolved_at ? dayjs(inc.resolved_at).format("MMM D YYYY HH:mm") : "";
+                csv += `"${dayjs(inc.created_at).format("MMM D YYYY HH:mm")}","${inc.id}","${inc.name}","${inc.type}","${inc.barangay}","${inc.location}","${inc.latitude || ''}","${inc.longitude || ''}","${inc.severity}","${inc.status}","${inc.responding_unit}","${inc.call_taker}","${inc.responder}","${inc.caller_name || ''}","${inc.caller_phone || ''}","${inc.caller_age || ''}","${resolvedAt}","${inc.casualties_dead}","${inc.casualties_injured}","${inc.casualties_missing}","${inc.evacuated_families}","${inc.evacuated_individuals}","${inc.details.replace(/"/g, '""')}"\n`;
             });
             csv += `\n`;
 
@@ -92,11 +93,21 @@ export function KpiView({
             csv += `\n`;
 
             csv += `--- FLOODED AREAS ---\n`;
-            csv += `Date,Barangay,Area Description,Severity\n`;
+            csv += `Date,Barangay,Area Description,Severity,Depth (m),Flood Time\n`;
             data.floodedAreas.forEach(f => {
-                csv += `"${dayjs(f.created_at).format("MMM D YYYY HH:mm")}","${f.barangay}","${f.area_description.replace(/"/g, '""')}","${f.severity}"\n`;
+                const floodTime = f.flood_time ? dayjs(f.flood_time).format("MMM D YYYY HH:mm") : "";
+                csv += `"${dayjs(f.created_at).format("MMM D YYYY HH:mm")}","${f.barangay}","${f.area_description.replace(/"/g, '""')}","${f.severity}","${f.depth_meters}","${floodTime}"\n`;
             });
             csv += `\n`;
+
+            if (data.floodedAreaUpdates && data.floodedAreaUpdates.length > 0) {
+                csv += `--- FLOODED AREA UPDATES ---\n`;
+                csv += `Date,Area ID,Status\n`;
+                data.floodedAreaUpdates.forEach(upd => {
+                    csv += `"${dayjs(upd.updated_at).format("MMM D YYYY HH:mm")}","${upd.flooded_area_id}","${upd.status}"\n`;
+                });
+                csv += `\n`;
+            }
 
             csv += `--- WATER LEVELS ---\n`;
             csv += `Date,Waterway Name,Level (m),Status\n`;
@@ -104,6 +115,15 @@ export function KpiView({
                 csv += `"${dayjs(w.updated_at).format("MMM D YYYY HH:mm")}","${w.waterway_name}","${w.level_meters}","${w.status}"\n`;
             });
             csv += `\n`;
+
+            if (data.waterLevelUpdates && data.waterLevelUpdates.length > 0) {
+                csv += `--- WATER LEVEL UPDATES ---\n`;
+                csv += `Date,Water Level ID,Level (m),Status\n`;
+                data.waterLevelUpdates.forEach(upd => {
+                    csv += `"${dayjs(upd.updated_at).format("MMM D YYYY HH:mm")}","${upd.water_level_id}","${upd.level_meters}","${upd.status}"\n`;
+                });
+                csv += `\n`;
+            }
 
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
