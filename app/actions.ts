@@ -9,9 +9,10 @@ import {
   preparednessTable,
   floodedAreasTable,
   waterLevelsTable,
+  floodedAreaUpdatesTable,
 } from "@/db/schema";
 import { drizzle } from "drizzle-orm/libsql";
-import { eq, desc, ne, and, gte } from "drizzle-orm";
+import { eq, desc, ne, and, gte, inArray } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import dayjs from "dayjs";
 
@@ -24,8 +25,11 @@ export type Vehicle = typeof vehiclesTable.$inferSelect;
 export type WaterRescueEquipment = typeof waterRescueEquipmentTable.$inferSelect;
 export type Personnel = typeof personnelTable.$inferSelect;
 export type Preparedness = typeof preparednessTable.$inferSelect;
-export type FloodedArea = typeof floodedAreasTable.$inferSelect;
+export type FloodedArea = typeof floodedAreasTable.$inferSelect & {
+  updates?: FloodedAreaUpdate[];
+};
 export type WaterLevel = typeof waterLevelsTable.$inferSelect;
+export type FloodedAreaUpdate = typeof floodedAreaUpdatesTable.$inferSelect;
 
 function revalidateAll() {
   revalidatePath("/");
@@ -155,6 +159,11 @@ export async function resolveIncident(id: number) {
 }
 
 export async function updateIncident(id: number, data: Partial<InsertIncident>) {
+  if (data.status === "Closed") {
+    data.resolved_at = Date.now();
+  } else if (data.status && data.status !== "Closed") {
+    data.resolved_at = null;
+  }
   await db.update(incidentsTable).set(data).where(eq(incidentsTable.id, id));
   revalidateAll();
 }
@@ -263,6 +272,11 @@ export async function upsertPersonnel(
   revalidateAll();
 }
 
+export async function deletePersonnel(id: number) {
+  await db.delete(personnelTable).where(eq(personnelTable.id, id));
+  revalidateAll();
+}
+
 // --- Preparedness Logic ---
 
 export async function getPreparedness(sessionId: number): Promise<Preparedness[]> {
@@ -295,24 +309,42 @@ export async function deletePreparedness(id: number) {
 // --- Flooded Areas Logic ---
 
 export async function getFloodedAreas(sessionId: number): Promise<FloodedArea[]> {
-  return await db
+  const areas = await db
     .select()
     .from(floodedAreasTable)
     .where(eq(floodedAreasTable.session_id, sessionId))
     .orderBy(desc(floodedAreasTable.created_at));
+
+  if (areas.length === 0) return [];
+  
+  const areaIds = areas.map(a => a.id);
+  const updates = await db
+    .select()
+    .from(floodedAreaUpdatesTable)
+    .where(inArray(floodedAreaUpdatesTable.flooded_area_id, areaIds))
+    .orderBy(desc(floodedAreaUpdatesTable.updated_at));
+
+  return areas.map(area => ({
+    ...area,
+    updates: updates.filter(u => u.flooded_area_id === area.id)
+  }));
 }
 
 export async function createFloodedArea(
   sessionId: number,
   barangay: string,
   areaDescription: string,
-  severity: string
+  severity: string,
+  depthMeters: number = 0,
+  floodTime: number | null = null
 ) {
   await db.insert(floodedAreasTable).values({
     session_id: sessionId,
     barangay,
     area_description: areaDescription,
     severity,
+    depth_meters: depthMeters,
+    flood_time: floodTime,
     created_at: Date.now(),
   });
   revalidateAll();
@@ -321,6 +353,23 @@ export async function createFloodedArea(
 export async function deleteFloodedArea(id: number) {
   await db.delete(floodedAreasTable).where(eq(floodedAreasTable.id, id));
   revalidateAll();
+}
+
+export async function addFloodUpdate(floodedAreaId: number, status: string) {
+  await db.insert(floodedAreaUpdatesTable).values({
+    flooded_area_id: floodedAreaId,
+    status,
+    updated_at: Date.now(),
+  });
+  revalidateAll();
+}
+
+export async function getFloodUpdates(floodedAreaId: number): Promise<FloodedAreaUpdate[]> {
+  return await db
+    .select()
+    .from(floodedAreaUpdatesTable)
+    .where(eq(floodedAreaUpdatesTable.flooded_area_id, floodedAreaId))
+    .orderBy(desc(floodedAreaUpdatesTable.updated_at));
 }
 
 // --- Water Levels Logic ---
@@ -336,9 +385,13 @@ export async function getWaterLevels(sessionId: number): Promise<WaterLevel[]> {
 export async function upsertWaterLevel(
   sessionId: number,
   waterwayName: string,
-  levelMeters: number,
-  status: string
+  levelMeters: number
 ) {
+  let status = "Normal";
+  if (levelMeters >= 13) status = "Critical";
+  else if (levelMeters >= 12) status = "Alert";
+  else if (levelMeters >= 11) status = "Alarm";
+
   const existing = await db
     .select()
     .from(waterLevelsTable)

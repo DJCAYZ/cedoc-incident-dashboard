@@ -2,10 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import dayjs from "dayjs";
 import {
   createFloodedArea,
   deleteFloodedArea,
   getFloodedAreas,
+  addFloodUpdate,
   upsertWaterLevel,
   getWaterLevels,
   FloodedArea,
@@ -25,7 +27,6 @@ import {
 
 const WATERWAYS = ["San Juan River", "Ermitaño Creek", "Maytunas Creek"];
 const FLOOD_SEVERITIES = ["Low", "Moderate", "High", "Critical"];
-const WATER_STATUSES = ["Normal", "Rising", "Critical", "Overflow"];
 
 const barangayNames = [
   "Balong-Bato", "Batis", "Corazon de Jesus", "Ermitaño", "Isabelita",
@@ -93,14 +94,20 @@ export function FloodForm({
   const [newBarangay, setNewBarangay] = useState("");
   const [newAreaDesc, setNewAreaDesc] = useState("");
   const [newSeverity, setNewSeverity] = useState("Moderate");
+  const [newDepthMeters, setNewDepthMeters] = useState("");
+  const [newFloodTime, setNewFloodTime] = useState(() => {
+    const d = new Date();
+    d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+    return d.toISOString().slice(0, 16);
+  });
   const [isAddingFlood, setIsAddingFlood] = useState(false);
   const [floodPage, setFloodPage] = useState(1);
   const itemsPerPage = 5;
 
   // Water levels state
   const [waterLevels, setWaterLevels] = useState<
-    { waterway_name: string; level_meters: number | ""; status: string }[]
-  >(WATERWAYS.map((w) => ({ waterway_name: w, level_meters: 0, status: "Normal" })));
+    { waterway_name: string; level_meters: number | ""; updated_at?: number }[]
+  >(WATERWAYS.map((w) => ({ waterway_name: w, level_meters: 0 })));
   const [isSavingLevels, setIsSavingLevels] = useState(false);
   const [levelsMsg, setLevelsMsg] = useState("");
 
@@ -120,7 +127,6 @@ export function FloodForm({
         return {
           waterway_name: w,
           level_meters: existing?.level_meters ?? 0,
-          status: existing?.status ?? "Normal",
         };
       });
       setWaterLevels(merged);
@@ -138,17 +144,26 @@ export function FloodForm({
     if (!newBarangay.trim() || !newAreaDesc.trim() || !sessionId) return;
     setIsAddingFlood(true);
     try {
+      const floodTimeUnix = newFloodTime ? new Date(newFloodTime).getTime() : null;
       await createFloodedArea(
         sessionId,
         newBarangay.trim(),
         newAreaDesc.trim(),
-        newSeverity
+        newSeverity,
+        Number(newDepthMeters || 0),
+        floodTimeUnix
       );
       const data = await getFloodedAreas(sessionId);
       setFloodedAreas(data);
       setNewBarangay("");
       setNewAreaDesc("");
       setNewSeverity("Moderate");
+      setNewDepthMeters("");
+      
+      const d = new Date();
+      d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+      setNewFloodTime(d.toISOString().slice(0, 16));
+      
       router.refresh();
     } catch (error) {
       console.error(error);
@@ -168,6 +183,16 @@ export function FloodForm({
     }
   };
 
+  const handleAddUpdate = async (id: number, status: string) => {
+    try {
+      await addFloodUpdate(id, status);
+      alert(`Update logged: ${status}`);
+    } catch (error) {
+      console.error(error);
+      alert("Failed to log update");
+    }
+  };
+
   const handleSaveWaterLevels = async () => {
     if (!sessionId) return;
     setIsSavingLevels(true);
@@ -176,8 +201,7 @@ export function FloodForm({
         await upsertWaterLevel(
           sessionId,
           wl.waterway_name,
-          Number(wl.level_meters || 0),
-          wl.status
+          Number(wl.level_meters || 0)
         );
       }
       setLevelsMsg("✓ Saved");
@@ -198,10 +222,18 @@ export function FloodForm({
   };
 
   const statusColor: Record<string, string> = {
-    Normal: "text-emerald-400",
-    Rising: "text-yellow-400",
-    Critical: "text-orange-400",
-    Overflow: "text-red-400",
+    Normal: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20",
+    Alarm: "text-yellow-400 bg-yellow-500/10 border-yellow-500/20",
+    Alert: "text-orange-400 bg-orange-500/10 border-orange-500/20",
+    Critical: "text-red-400 bg-red-500/10 border-red-500/20",
+  };
+
+  const getLevelStatus = (m: number | "") => {
+    if (m === "") return "Normal";
+    if (m >= 13) return "Critical";
+    if (m >= 12) return "Alert";
+    if (m >= 11) return "Alarm";
+    return "Normal";
   };
 
   return (
@@ -241,16 +273,23 @@ export function FloodForm({
               className="bg-slate-950/60 border border-slate-800/60 rounded-xl p-3"
             >
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-bold text-cyan-300">
-                  {wl.waterway_name}
-                </span>
+                <div className="flex flex-col">
+                  <span className="text-sm font-bold text-cyan-300">
+                    {wl.waterway_name}
+                  </span>
+                  {wl.updated_at ? (
+                    <span className="text-[9px] text-slate-500 font-bold mt-0.5 uppercase tracking-wider">
+                      Last updated as of: {dayjs(wl.updated_at).format('MMM D, YYYY h:mm A')}
+                    </span>
+                  ) : null}
+                </div>
                 <span
-                  className={`text-xs font-bold ${statusColor[wl.status] || "text-slate-400"}`}
+                  className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border ${statusColor[getLevelStatus(wl.level_meters)] || "text-slate-400"}`}
                 >
-                  {wl.status}
+                  {getLevelStatus(wl.level_meters)}
                 </span>
               </div>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 gap-2">
                 <div className="flex flex-col gap-0.5">
                   <label className="text-[9px] text-slate-500 uppercase tracking-wider font-bold">
                     Level (meters)
@@ -258,7 +297,7 @@ export function FloodForm({
                   <input
                     type="number"
                     min="0"
-                    step="0.1"
+                    step="1"
                     value={wl.level_meters}
                     onChange={(e) => {
                       const val = e.target.value;
@@ -269,28 +308,8 @@ export function FloodForm({
                       };
                       setWaterLevels(updated);
                     }}
-                    className="bg-slate-950 border border-slate-800 text-white rounded-lg p-1.5 text-center text-sm font-bold focus:ring-2 focus:ring-cyan-600 focus:outline-none w-full min-w-[65px]"
+                    className="bg-slate-950 border border-slate-800 text-white rounded-lg p-1.5 text-center text-sm font-bold focus:ring-2 focus:ring-cyan-600 focus:outline-none w-full"
                   />
-                </div>
-                <div className="flex flex-col gap-0.5">
-                  <label className="text-[9px] text-slate-500 uppercase tracking-wider font-bold">
-                    Status
-                  </label>
-                  <select
-                    value={wl.status}
-                    onChange={(e) => {
-                      const updated = [...waterLevels];
-                      updated[idx] = { ...updated[idx], status: e.target.value };
-                      setWaterLevels(updated);
-                    }}
-                    className="bg-slate-950 border border-slate-800 text-slate-200 rounded-lg p-1.5 text-sm focus:ring-2 focus:ring-cyan-600 focus:outline-none cursor-pointer"
-                  >
-                    {WATER_STATUSES.map((s) => (
-                      <option key={s} value={s}>
-                        {s}
-                      </option>
-                    ))}
-                  </select>
                 </div>
               </div>
             </div>
@@ -356,6 +375,23 @@ export function FloodForm({
             className="bg-slate-950 border border-slate-800 text-white rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-600 focus:outline-none placeholder-slate-600"
             required
           />
+          <div className="grid grid-cols-2 gap-2">
+            <input
+              type="number"
+              step="0.1"
+              min="0"
+              value={newDepthMeters}
+              onChange={(e) => setNewDepthMeters(e.target.value)}
+              placeholder="Depth (meters)"
+              className="bg-slate-950 border border-slate-800 text-white rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-600 focus:outline-none placeholder-slate-600"
+            />
+            <input
+              type="datetime-local"
+              value={newFloodTime}
+              onChange={(e) => setNewFloodTime(e.target.value)}
+              className="bg-slate-950 border border-slate-800 text-slate-300 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-600 focus:outline-none placeholder-slate-600"
+            />
+          </div>
           <Button
             type="submit"
             disabled={isAddingFlood || !newBarangay || !newAreaDesc.trim()}
@@ -388,29 +424,54 @@ export function FloodForm({
                     }`}
                   />
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-0.5">
-                      <span className="text-sm font-bold text-white">
-                        {area.barangay}
-                      </span>
-                      <span
-                        className={`text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded border ${severityColor[area.severity] || ""}`}
+                    <div className="flex items-center justify-between mb-0.5">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-bold text-white">
+                          {area.barangay}
+                        </span>
+                        <span
+                          className={`text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded border ${severityColor[area.severity] || ""}`}
+                        >
+                          {area.severity}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteFlood(area.id)}
+                        className="text-rose-500/50 hover:text-rose-400 transition-colors p-1 rounded-lg hover:bg-rose-500/10 cursor-pointer opacity-0 group-hover:opacity-100"
+                        title="Remove"
                       >
-                        {area.severity}
-                      </span>
+                        <Trash2 size={14} />
+                      </button>
                     </div>
-                    <p className="text-xs text-slate-400 flex items-center gap-1 break-words">
+                    <p className="text-xs text-slate-400 flex items-center gap-1 break-words mb-2">
                       <MapPin size={10} className="shrink-0" />
                       {area.area_description}
+                      {area.depth_meters > 0 && ` • ${area.depth_meters}m deep`}
                     </p>
+                    <div className="flex flex-wrap gap-1.5 mt-1">
+                      {["Stable", "Rising", "Subsiding", "Subsided"].map((status) => (
+                        <button
+                          key={status}
+                          type="button"
+                          onClick={() => handleAddUpdate(area.id, status)}
+                          className="text-[9px] font-bold uppercase px-2 py-1 bg-slate-900 border border-slate-800 rounded hover:bg-slate-800 text-slate-300 transition-colors"
+                        >
+                          {status}
+                        </button>
+                      ))}
+                    </div>
+                    {area.updates && area.updates.length > 0 && (
+                      <div className="mt-3 pt-2 border-t border-slate-800 flex flex-col gap-1">
+                        {area.updates.map(u => (
+                          <div key={u.id} className="flex justify-between items-center text-[10px] text-slate-400">
+                            <span className="font-bold">{u.status}</span>
+                            <span>{dayjs(u.updated_at).format('MMM D, YYYY h:mm A')}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => handleDeleteFlood(area.id)}
-                    className="text-rose-500/50 hover:text-rose-400 transition-colors p-1 rounded-lg hover:bg-rose-500/10 cursor-pointer opacity-0 group-hover:opacity-100"
-                    title="Remove"
-                  >
-                    <Trash2 size={14} />
-                  </button>
                 </div>
               ))}
             </div>
