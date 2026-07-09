@@ -1,0 +1,1168 @@
+{
+    "Balong-Bato": {
+        "major": [
+            {
+                "name": "N. Domingo",
+                "lat": "14.6062",
+                "lng": "121.0305"
+            },
+            {
+                "name": "F. Roman",
+                "lat": "14.6063",
+                "lng": "121.0306"
+            },
+            {
+                "name": "A. Lake",
+                "lat": "14.6064",
+                "lng": "121.0307"
+            }
+        ],
+        "minor": [
+            {
+                "name": "R. Pascual",
+                "lat": "14.6061",
+                "lng": "121.0304"
+            },
+            {
+                "name": "S. Guzman",
+                "lat": "14.6060",
+                "lng": "121.0303"
+            },
+            {
+                "name": "E. Angeles",
+                "lat": "14.6059",
+                "lng": "121.0302"
+            },
+            {
+                "name": "C. Leyva",
+                "lat": "14.6058",
+                "lng": "121.0301"
+            },
+            {
+                "name": "A. Santos",
+                "lat": "14.6057",
+                "lng": "121.0300"
+            },
+            {
+                "name": "Severo",
+                "lat": "14.6056",
+                "lng": "121.0299"
+            }
+        ]
+    },
+    "Batis": {
+        "major": [
+            {
+                "name": "F. Manalo",
+                "lat": "14.6006",
+                "lng": "121.0267"
+            },
+            {
+                "name": "F. Blumentritt",
+                "lat": "14.6007",
+                "lng": "121.0268"
+            },
+            {
+                "name": "N. Domingo",
+                "lat": "14.6008",
+                "lng": "121.0269"
+            }
+        ],
+        "minor": [
+            {
+                "name": "San Luis",
+                "lat": "14.6005",
+                "lng": "121.0266"
+            },
+            {
+                "name": "San Miguel",
+                "lat": "14.6004",
+                "lng": "121.0265"
+            },
+            {
+                "name": "San Gabriel",
+                "lat": "14.6003",
+                "lng": "121.0264"
+            },
+            {
+                "name": "San Rafael",
+                "lat": "14.6002",
+                "lng": "121.0263"
+            },
+            {
+                "name": "S. Tuazon",
+                "lat": "14.6001",
+                "lng": "121.0262"
+            },
+            {
+                "name": "F. Roman (boundary)",
+                "lat": "14.6000",
+                "lng": "121.0261"
+            },
+            {
+                "name": "Interior Batis (alleys)",
+                "lat": "14.5999",
+                "lng": "121.0260"
+            }
+        ]
+    },
+    "Corazon de Jesus": {
+        "major": [
+            {
+                "name": "Pinaglabanan",
+                "lat": "14.6041",
+                "lng": "121.0312"
+            },
+            {
+                "name": "N. Domingo",
+                "lat": "14.6042",
+                "lng": "121.0313"
+            },
+            {
+                "name": "A. Lake",
+                "lat": "14.6043",
+                "lng": "121.0314"
+            }
+        ],
+        "minor": [
+            {
+                "name": "P. Narciso",
+                "lat": "14.6040",
+                "lng": "121.0311"
+            },
+            {
+                "name": "M. Paterno",
+                "lat": "14.6039",
+                "lng": "121.0310"
+            },
+            {
+                "name": "E. Fernandez",
+                "lat": "14.6038",
+                "lng": "121.0309"
+            },
+            {
+                "name": "G. Reyes",
+                "lat": "14.6037",
+                "lng": "121.0308"
+            },
+            {
+                "name": "S. Veloso",
+                "lat": "14.6036",
+                "lng": "121.0307"
+            },
+            {
+                "name": "Interior Corazon de Jesus",
+                "lat": "14.6035",
+                "lng": "121.0306"
+            }
+        ]
+    },
+    "Ermita\u00f1o": {
+        "major": [
+            {
+                "name": "N. Domingo",
+                "lat": "14.6111",
+                "lng": "121.0298"
+            },
+            {
+                "name": "Aurora Boulevard",
+                "lat": "14.6112",
+                "lng": "121.0299"
+            },
+            {
+                "name": "G. Puyat (Artiaga)",
+                "lat": "14.6113",
+                "lng": "121.0300"
+            }
+        ],
+        "minor": [
+            {
+                "name": "F. Santos",
+                "lat": "14.6110",
+                "lng": "121.0297"
+            },
+            {
+                "name": "R. Lagmay",
+                "lat": "14.6109",
+                "lng": "121.0296"
+            },
+            {
+                "name": "Salapan Street",
+                "lat": "14.6108",
+                "lng": "121.0295"
+            },
+            {
+                "name": "H. Lozada (boundary)",
+                "lat": "14.6107",
+                "lng": "121.0294"
+            },
+            {
+                "name": "J. Ruiz (boundary)",
+                "lat": "14.6106",
+                "lng": "121.0293"
+            }
+        ]
+    },
+    "Pasadena": {
+        "major": [
+            {
+                "name": "N. Domingo",
+                "lat": "14.6078",
+                "lng": "121.0369"
+            },
+            {
+                "name": "Ortigas Avenue",
+                "lat": "14.6079",
+                "lng": "121.0370"
+            },
+            {
+                "name": "F. Benitez",
+                "lat": "14.6080",
+                "lng": "121.0371"
+            }
+        ],
+        "minor": [
+            {
+                "name": "M. Paterno",
+                "lat": "14.6077",
+                "lng": "121.0368"
+            },
+            {
+                "name": "Lse (L.S.E.)",
+                "lat": "14.6076",
+                "lng": "121.0367"
+            },
+            {
+                "name": "1st Street",
+                "lat": "14.6075",
+                "lng": "121.0366"
+            },
+            {
+                "name": "2nd Street",
+                "lat": "14.6074",
+                "lng": "121.0365"
+            }
+        ]
+    },
+    "Pedro Cruz": {
+        "major": [
+            {
+                "name": "F. Blumentritt",
+                "lat": "14.6028",
+                "lng": "121.0289"
+            },
+            {
+                "name": "N. Domingo",
+                "lat": "14.6029",
+                "lng": "121.0290"
+            },
+            {
+                "name": "Pinaglabanan",
+                "lat": "14.6030",
+                "lng": "121.0291"
+            }
+        ],
+        "minor": [
+            {
+                "name": "J. Basa",
+                "lat": "14.6027",
+                "lng": "121.0288"
+            },
+            {
+                "name": "R. Pascual",
+                "lat": "14.6026",
+                "lng": "121.0287"
+            },
+            {
+                "name": "A. Bonifacio",
+                "lat": "14.6025",
+                "lng": "121.0286"
+            },
+            {
+                "name": "S. Veloso",
+                "lat": "14.6024",
+                "lng": "121.0285"
+            },
+            {
+                "name": "G. Reyes",
+                "lat": "14.6023",
+                "lng": "121.0284"
+            }
+        ]
+    },
+    "Progreso": {
+        "major": [
+            {
+                "name": "N. Domingo",
+                "lat": "14.6011",
+                "lng": "121.0289"
+            },
+            {
+                "name": "F. Blumentritt",
+                "lat": "14.6012",
+                "lng": "121.0290"
+            }
+        ],
+        "minor": [
+            {
+                "name": "M. Cruz",
+                "lat": "14.6010",
+                "lng": "121.0288"
+            },
+            {
+                "name": "Rivera",
+                "lat": "14.6009",
+                "lng": "121.0287"
+            },
+            {
+                "name": "A. Bonifacio",
+                "lat": "14.6008",
+                "lng": "121.0286"
+            },
+            {
+                "name": "Progreso Street",
+                "lat": "14.6007",
+                "lng": "121.0285"
+            },
+            {
+                "name": "C. Santos",
+                "lat": "14.6006",
+                "lng": "121.0284"
+            }
+        ]
+    },
+    "Rivera": {
+        "major": [
+            {
+                "name": "N. Domingo",
+                "lat": "14.6056",
+                "lng": "121.0289"
+            },
+            {
+                "name": "Pinaglabanan",
+                "lat": "14.6057",
+                "lng": "121.0290"
+            }
+        ],
+        "minor": [
+            {
+                "name": "L.G.B. Santos (Santiago)",
+                "lat": "14.6055",
+                "lng": "121.0288"
+            },
+            {
+                "name": "A. Bonifacio",
+                "lat": "14.6054",
+                "lng": "121.0287"
+            },
+            {
+                "name": "Rivera Street",
+                "lat": "14.6053",
+                "lng": "121.0286"
+            },
+            {
+                "name": "Proyekto",
+                "lat": "14.6052",
+                "lng": "121.0285"
+            }
+        ]
+    },
+    "Salapan": {
+        "major": [
+            {
+                "name": "Aurora Boulevard",
+                "lat": "14.6128",
+                "lng": "121.0261"
+            },
+            {
+                "name": "N. Domingo",
+                "lat": "14.6129",
+                "lng": "121.0262"
+            }
+        ],
+        "minor": [
+            {
+                "name": "J. Ruiz",
+                "lat": "14.6127",
+                "lng": "121.0260"
+            },
+            {
+                "name": "A. Luna",
+                "lat": "14.6126",
+                "lng": "121.0259"
+            },
+            {
+                "name": "H. Lozada",
+                "lat": "14.6125",
+                "lng": "121.0258"
+            },
+            {
+                "name": "Mapa",
+                "lat": "14.6124",
+                "lng": "121.0257"
+            },
+            {
+                "name": "S. Veloso",
+                "lat": "14.6123",
+                "lng": "121.0256"
+            },
+            {
+                "name": "R. Lagmay",
+                "lat": "14.6122",
+                "lng": "121.0255"
+            }
+        ]
+    },
+    "San Perfecto": {
+        "major": [
+            {
+                "name": "N. Domingo",
+                "lat": "14.6003",
+                "lng": "121.0253"
+            },
+            {
+                "name": "F. Blumentritt",
+                "lat": "14.6004",
+                "lng": "121.0254"
+            }
+        ],
+        "minor": [
+            {
+                "name": "San Perfecto Street",
+                "lat": "14.6002",
+                "lng": "121.0252"
+            },
+            {
+                "name": "T. Claudio",
+                "lat": "14.6001",
+                "lng": "121.0251"
+            },
+            {
+                "name": "A. Bonifacio",
+                "lat": "14.6000",
+                "lng": "121.0250"
+            },
+            {
+                "name": "Katipunan",
+                "lat": "14.5999",
+                "lng": "121.0249"
+            },
+            {
+                "name": "Lazerna",
+                "lat": "14.5998",
+                "lng": "121.0248"
+            }
+        ]
+    },
+    "Addition Hills": {
+        "major": [
+            {
+                "name": "P. Guevarra",
+                "lat": "14.5944",
+                "lng": "121.0361"
+            },
+            {
+                "name": "Santolan Road",
+                "lat": "14.5945",
+                "lng": "121.0362"
+            },
+            {
+                "name": "F. Blumentritt",
+                "lat": "14.5946",
+                "lng": "121.0363"
+            }
+        ],
+        "minor": [
+            {
+                "name": "A. Mabini",
+                "lat": "14.5943",
+                "lng": "121.0360"
+            },
+            {
+                "name": "A. Luna",
+                "lat": "14.5942",
+                "lng": "121.0359"
+            },
+            {
+                "name": "P. Burgos",
+                "lat": "14.5941",
+                "lng": "121.0358"
+            },
+            {
+                "name": "J.P. Rizal",
+                "lat": "14.5940",
+                "lng": "121.0357"
+            },
+            {
+                "name": "C.M. Recto",
+                "lat": "14.5939",
+                "lng": "121.0356"
+            },
+            {
+                "name": "Calderon",
+                "lat": "14.5938",
+                "lng": "121.0355"
+            },
+            {
+                "name": "Gruet",
+                "lat": "14.5937",
+                "lng": "121.0354"
+            },
+            {
+                "name": "Ortega",
+                "lat": "14.5936",
+                "lng": "121.0353"
+            },
+            {
+                "name": "Hoover",
+                "lat": "14.5935",
+                "lng": "121.0352"
+            },
+            {
+                "name": "Wilson (boundary)",
+                "lat": "14.5934",
+                "lng": "121.0351"
+            },
+            {
+                "name": "Baguio Road",
+                "lat": "14.5933",
+                "lng": "121.0350"
+            },
+            {
+                "name": "Baldovino",
+                "lat": "14.5932",
+                "lng": "121.0349"
+            },
+            {
+                "name": "Pilar",
+                "lat": "14.5931",
+                "lng": "121.0348"
+            },
+            {
+                "name": "Gomez",
+                "lat": "14.5930",
+                "lng": "121.0347"
+            },
+            {
+                "name": "Zamora",
+                "lat": "14.5929",
+                "lng": "121.0346"
+            },
+            {
+                "name": "Inocencio",
+                "lat": "14.5928",
+                "lng": "121.0345"
+            },
+            {
+                "name": "Villamor",
+                "lat": "14.5927",
+                "lng": "121.0344"
+            },
+            {
+                "name": "Area 1",
+                "lat": "14.5926",
+                "lng": "121.0343"
+            },
+            {
+                "name": "Area 2",
+                "lat": "14.5925",
+                "lng": "121.0342"
+            },
+            {
+                "name": "Area 3",
+                "lat": "14.5924",
+                "lng": "121.0341"
+            },
+            {
+                "name": "Area 4",
+                "lat": "14.5923",
+                "lng": "121.0340"
+            },
+            {
+                "name": "Area 5",
+                "lat": "14.5922",
+                "lng": "121.0339"
+            }
+        ]
+    },
+    "Greenhills": {
+        "major": [
+            {
+                "name": "Ortigas Avenue",
+                "lat": "14.6017",
+                "lng": "121.0506"
+            },
+            {
+                "name": "EDSA (boundary)",
+                "lat": "14.6018",
+                "lng": "121.0507"
+            },
+            {
+                "name": "Wilson",
+                "lat": "14.6019",
+                "lng": "121.0508"
+            },
+            {
+                "name": "Annapolis",
+                "lat": "14.6020",
+                "lng": "121.0509"
+            },
+            {
+                "name": "Connecticut",
+                "lat": "14.6021",
+                "lng": "121.0510"
+            }
+        ],
+        "minor": [
+            {
+                "name": "Kennedy",
+                "lat": "14.6016",
+                "lng": "121.0505"
+            },
+            {
+                "name": "Johnson",
+                "lat": "14.6015",
+                "lng": "121.0504"
+            },
+            {
+                "name": "Jefferson",
+                "lat": "14.6014",
+                "lng": "121.0503"
+            },
+            {
+                "name": "Lincoln",
+                "lat": "14.6013",
+                "lng": "121.0502"
+            },
+            {
+                "name": "Grant",
+                "lat": "14.6012",
+                "lng": "121.0501"
+            },
+            {
+                "name": "Polk",
+                "lat": "14.6011",
+                "lng": "121.0500"
+            },
+            {
+                "name": "Madison",
+                "lat": "14.6010",
+                "lng": "121.0499"
+            },
+            {
+                "name": "Washington",
+                "lat": "14.6009",
+                "lng": "121.0498"
+            },
+            {
+                "name": "Adams",
+                "lat": "14.6008",
+                "lng": "121.0497"
+            },
+            {
+                "name": "Jackson",
+                "lat": "14.6007",
+                "lng": "121.0496"
+            },
+            {
+                "name": "Van Buren",
+                "lat": "14.6006",
+                "lng": "121.0495"
+            },
+            {
+                "name": "Hayes",
+                "lat": "14.6005",
+                "lng": "121.0494"
+            },
+            {
+                "name": "Garfield",
+                "lat": "14.6004",
+                "lng": "121.0493"
+            },
+            {
+                "name": "McKinley",
+                "lat": "14.6003",
+                "lng": "121.0492"
+            },
+            {
+                "name": "Roosevelt",
+                "lat": "14.6002",
+                "lng": "121.0491"
+            },
+            {
+                "name": "Eisenhower",
+                "lat": "14.6001",
+                "lng": "121.0490"
+            },
+            {
+                "name": "Cardinal",
+                "lat": "14.6000",
+                "lng": "121.0489"
+            },
+            {
+                "name": "Purdue",
+                "lat": "14.5999",
+                "lng": "121.0488"
+            },
+            {
+                "name": "Duke",
+                "lat": "14.5998",
+                "lng": "121.0487"
+            },
+            {
+                "name": "Yale",
+                "lat": "14.5997",
+                "lng": "121.0486"
+            },
+            {
+                "name": "Harvard",
+                "lat": "14.5996",
+                "lng": "121.0485"
+            },
+            {
+                "name": "Princeton",
+                "lat": "14.5995",
+                "lng": "121.0484"
+            },
+            {
+                "name": "Stanford",
+                "lat": "14.5994",
+                "lng": "121.0483"
+            },
+            {
+                "name": "Columbia",
+                "lat": "14.5993",
+                "lng": "121.0482"
+            },
+            {
+                "name": "Notre Dame",
+                "lat": "14.5992",
+                "lng": "121.0481"
+            },
+            {
+                "name": "La Salle",
+                "lat": "14.5991",
+                "lng": "121.0480"
+            },
+            {
+                "name": "Ateneo",
+                "lat": "14.5990",
+                "lng": "121.0479"
+            },
+            {
+                "name": "Missouri",
+                "lat": "14.5989",
+                "lng": "121.0478"
+            },
+            {
+                "name": "Florida",
+                "lat": "14.5988",
+                "lng": "121.0477"
+            },
+            {
+                "name": "Club Filipino Ave",
+                "lat": "14.5987",
+                "lng": "121.0476"
+            },
+            {
+                "name": "Atlanta",
+                "lat": "14.5986",
+                "lng": "121.0475"
+            },
+            {
+                "name": "Schroder",
+                "lat": "14.5985",
+                "lng": "121.0474"
+            }
+        ]
+    },
+    "Isabelita": {
+        "major": [
+            {
+                "name": "Santolan Road",
+                "lat": "14.6022",
+                "lng": "121.0394"
+            }
+        ],
+        "minor": [
+            {
+                "name": "P. Perey",
+                "lat": "14.6021",
+                "lng": "121.0393"
+            },
+            {
+                "name": "F. Manalo (Extension)",
+                "lat": "14.6020",
+                "lng": "121.0392"
+            },
+            {
+                "name": "A. Rita (boundary)",
+                "lat": "14.6019",
+                "lng": "121.0391"
+            }
+        ]
+    },
+    "Kabayanan": {
+        "major": [
+            {
+                "name": "N. Domingo",
+                "lat": "14.5956",
+                "lng": "121.0265"
+            },
+            {
+                "name": "F. Blumentritt",
+                "lat": "14.5957",
+                "lng": "121.0266"
+            }
+        ],
+        "minor": [
+            {
+                "name": "A. Bonifacio",
+                "lat": "14.5955",
+                "lng": "121.0264"
+            },
+            {
+                "name": "S. Bumatay",
+                "lat": "14.5954",
+                "lng": "121.0263"
+            },
+            {
+                "name": "Puto",
+                "lat": "14.5953",
+                "lng": "121.0262"
+            },
+            {
+                "name": "F. Manalo",
+                "lat": "14.5952",
+                "lng": "121.0261"
+            }
+        ]
+    },
+    "Little Baguio": {
+        "major": [
+            {
+                "name": "P. Guevarra",
+                "lat": "14.5975",
+                "lng": "121.0347"
+            },
+            {
+                "name": "F. Blumentritt",
+                "lat": "14.5976",
+                "lng": "121.0348"
+            },
+            {
+                "name": "Santolan Road",
+                "lat": "14.5977",
+                "lng": "121.0349"
+            }
+        ],
+        "minor": [
+            {
+                "name": "Jose Gil (Valenzuela)",
+                "lat": "14.5974",
+                "lng": "121.0346"
+            },
+            {
+                "name": "J. Abad Santos",
+                "lat": "14.5973",
+                "lng": "121.0345"
+            },
+            {
+                "name": "V. Iba\u00f1ez",
+                "lat": "14.5972",
+                "lng": "121.0344"
+            },
+            {
+                "name": "Gen. San Miguel",
+                "lat": "14.5971",
+                "lng": "121.0343"
+            },
+            {
+                "name": "Gen. Gutierrez",
+                "lat": "14.5970",
+                "lng": "121.0342"
+            },
+            {
+                "name": "Gandia",
+                "lat": "14.5969",
+                "lng": "121.0341"
+            },
+            {
+                "name": "Sgt. J. Catolos",
+                "lat": "14.5968",
+                "lng": "121.0340"
+            },
+            {
+                "name": "R. Lagmay",
+                "lat": "14.5967",
+                "lng": "121.0339"
+            },
+            {
+                "name": "O. Arellano",
+                "lat": "14.5966",
+                "lng": "121.0338"
+            },
+            {
+                "name": "T. Benitez",
+                "lat": "14.5965",
+                "lng": "121.0337"
+            },
+            {
+                "name": "C. Benitez",
+                "lat": "14.5964",
+                "lng": "121.0336"
+            }
+        ]
+    },
+    "Maytunas": {
+        "major": [
+            {
+                "name": "P. Guevarra",
+                "lat": "14.5925",
+                "lng": "121.0389"
+            },
+            {
+                "name": "Santolan Road",
+                "lat": "14.5926",
+                "lng": "121.0390"
+            }
+        ],
+        "minor": [
+            {
+                "name": "M.H. Del Pilar",
+                "lat": "14.5924",
+                "lng": "121.0388"
+            },
+            {
+                "name": "V. Cruz",
+                "lat": "14.5923",
+                "lng": "121.0387"
+            },
+            {
+                "name": "L. Gruet",
+                "lat": "14.5922",
+                "lng": "121.0386"
+            },
+            {
+                "name": "Mariano Marcos",
+                "lat": "14.5921",
+                "lng": "121.0385"
+            },
+            {
+                "name": "E. Fernandez",
+                "lat": "14.5920",
+                "lng": "121.0384"
+            },
+            {
+                "name": "C.M. Recto (boundary)",
+                "lat": "14.5919",
+                "lng": "121.0383"
+            }
+        ]
+    },
+    "Onse": {
+        "major": [
+            {
+                "name": "F. Blumentritt",
+                "lat": "14.5986",
+                "lng": "121.0308"
+            }
+        ],
+        "minor": [
+            {
+                "name": "A. Ibuna",
+                "lat": "14.5985",
+                "lng": "121.0307"
+            },
+            {
+                "name": "A. Rita",
+                "lat": "14.5984",
+                "lng": "121.0306"
+            },
+            {
+                "name": "P. Guevarra (boundary)",
+                "lat": "14.5983",
+                "lng": "121.0305"
+            },
+            {
+                "name": "11th Street",
+                "lat": "14.5982",
+                "lng": "121.0304"
+            }
+        ]
+    },
+    "Saint Joseph": {
+        "major": [
+            {
+                "name": "N. Domingo",
+                "lat": "14.6033",
+                "lng": "121.0261"
+            },
+            {
+                "name": "F. Blumentritt",
+                "lat": "14.6034",
+                "lng": "121.0262"
+            }
+        ],
+        "minor": [
+            {
+                "name": "A. Bonifacio",
+                "lat": "14.6032",
+                "lng": "121.0260"
+            },
+            {
+                "name": "A. Lake",
+                "lat": "14.6031",
+                "lng": "121.0259"
+            },
+            {
+                "name": "F. Manalo (boundary)",
+                "lat": "14.6030",
+                "lng": "121.0258"
+            },
+            {
+                "name": "Rivera (boundary)",
+                "lat": "14.6029",
+                "lng": "121.0257"
+            }
+        ]
+    },
+    "Santa Lucia": {
+        "major": [
+            {
+                "name": "F. Blumentritt",
+                "lat": "14.5953",
+                "lng": "121.0319"
+            },
+            {
+                "name": "P. Guevarra",
+                "lat": "14.5954",
+                "lng": "121.0320"
+            },
+            {
+                "name": "Santolan Road",
+                "lat": "14.5955",
+                "lng": "121.0321"
+            }
+        ],
+        "minor": [
+            {
+                "name": "J. Abad Santos",
+                "lat": "14.5952",
+                "lng": "121.0318"
+            },
+            {
+                "name": "V. Cruz",
+                "lat": "14.5951",
+                "lng": "121.0317"
+            },
+            {
+                "name": "M. Salvador",
+                "lat": "14.5950",
+                "lng": "121.0316"
+            },
+            {
+                "name": "A. Ibuna",
+                "lat": "14.5949",
+                "lng": "121.0315"
+            },
+            {
+                "name": "T. Benitez",
+                "lat": "14.5948",
+                "lng": "121.0314"
+            },
+            {
+                "name": "S. Guzman",
+                "lat": "14.5947",
+                "lng": "121.0313"
+            }
+        ]
+    },
+    "Tibagan": {
+        "major": [
+            {
+                "name": "F. Blumentritt",
+                "lat": "14.5972",
+                "lng": "121.0253"
+            },
+            {
+                "name": "N. Domingo",
+                "lat": "14.5973",
+                "lng": "121.0254"
+            }
+        ],
+        "minor": [
+            {
+                "name": "A. Bonifacio",
+                "lat": "14.5971",
+                "lng": "121.0252"
+            },
+            {
+                "name": "Arellano",
+                "lat": "14.5970",
+                "lng": "121.0251"
+            },
+            {
+                "name": "J. Basa",
+                "lat": "14.5969",
+                "lng": "121.0250"
+            },
+            {
+                "name": "Kabayanan (boundary)",
+                "lat": "14.5968",
+                "lng": "121.0249"
+            }
+        ]
+    },
+    "West Crame": {
+        "major": [
+            {
+                "name": "Col. Bonny Serrano",
+                "lat": "14.6083",
+                "lng": "121.0417"
+            },
+            {
+                "name": "1st West Crame",
+                "lat": "14.6084",
+                "lng": "121.0418"
+            }
+        ],
+        "minor": [
+            {
+                "name": "Road 1",
+                "lat": "14.6082",
+                "lng": "121.0416"
+            },
+            {
+                "name": "Road 2",
+                "lat": "14.6081",
+                "lng": "121.0415"
+            },
+            {
+                "name": "Road 3",
+                "lat": "14.6080",
+                "lng": "121.0414"
+            },
+            {
+                "name": "Road 4",
+                "lat": "14.6079",
+                "lng": "121.0413"
+            },
+            {
+                "name": "Road 5",
+                "lat": "14.6078",
+                "lng": "121.0412"
+            },
+            {
+                "name": "Road 6",
+                "lat": "14.6077",
+                "lng": "121.0411"
+            },
+            {
+                "name": "O. Arellano",
+                "lat": "14.6076",
+                "lng": "121.0410"
+            }
+        ]
+    }
+}
