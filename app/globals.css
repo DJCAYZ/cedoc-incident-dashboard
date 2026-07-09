@@ -121,9 +121,11 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
+
   html {
     @apply font-sans;
   }
@@ -131,16 +133,29 @@
 
 /* Override Leaflet's default tooltip styling */
 .leaflet-tooltip.bg-transparent {
-    background-color: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 /* UI/UX Pro Max: HUD Sonar Pulse Effect */
 @keyframes hud-sonar-pulse {
-  0% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; box-shadow: 0 0 10px currentColor; }
-  50% { opacity: 0.4; box-shadow: 0 0 20px currentColor; }
-  100% { transform: translate(-50%, -50%) scale(3.5); opacity: 0; box-shadow: 0 0 5px currentColor; }
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.8;
+    box-shadow: 0 0 10px currentColor;
+  }
+
+  50% {
+    opacity: 0.4;
+    box-shadow: 0 0 20px currentColor;
+  }
+
+  100% {
+    transform: translate(-50%, -50%) scale(3.5);
+    opacity: 0;
+    box-shadow: 0 0 5px currentColor;
+  }
 }
 
 .animate-hud-pulse {
