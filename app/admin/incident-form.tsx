@@ -553,6 +553,7 @@ export function IncidentForm({ activeSessions, activeIncidents }: { activeSessio
                         </div>
 
                         {/* Location Details */}
+
                         <div className="flex flex-col gap-1.5 md:col-span-2">
                             <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
                                 <MapPin size={12} className="text-blue-400" />
@@ -728,6 +729,7 @@ export function IncidentForm({ activeSessions, activeIncidents }: { activeSessio
                                 className="bg-slate-950 border border-slate-800 text-white rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-600 focus:border-blue-500 focus:outline-none transition-all cursor-text"
                             />
                         </div>
+
 
                         {/* Incident Logs/Logs Description */}
                         <div className="flex flex-col gap-1.5 md:col-span-2">
