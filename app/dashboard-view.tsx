@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import dayjs from "dayjs";
 import { useQuery } from "@tanstack/react-query";
 import { 
     getIncidents, 
@@ -308,7 +309,7 @@ export function DashboardView({ session }: { session: Session }) {
                             <table className="w-full text-left text-lg">
                                 <thead>
                                     <tr className="text-slate-400 border-b border-slate-700 text-xl">
-                                        <th className="pb-3 pr-4">Time</th>
+                                        <th className="pb-3 pr-4">Date & Time</th>
                                         <th className="pb-3 pr-4">Barangay</th>
                                         <th className="pb-3 pr-4">Incident</th>
                                         <th className="pb-3 pr-4">Severity</th>
@@ -320,7 +321,7 @@ export function DashboardView({ session }: { session: Session }) {
                                 <tbody>
                                     {incidents.slice((incidentPage - 1) * incidentPerPage, incidentPage * incidentPerPage).map(inc => (
                                         <tr key={inc.id} className="border-b border-slate-700/50 hover:bg-slate-700/30 transition-colors">
-                                            <td className="py-3 pr-4 text-slate-300 whitespace-nowrap">{new Date(inc.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
+                                            <td className="py-3 pr-4 text-slate-300 whitespace-nowrap">{dayjs(inc.created_at).format("MMM D, hh:mm A")}</td>
                                             <td className="py-3 pr-4 text-blue-200">{inc.barangay}</td>
                                             <td className="py-3 pr-4 font-medium">{inc.name}</td>
                                             <td className="py-3 pr-4">
@@ -472,7 +473,7 @@ export function DashboardView({ session }: { session: Session }) {
                         <h2 className="text-2xl font-bold mb-4 uppercase tracking-wider text-slate-300 border-b border-slate-600 pb-2">Emergency Contacts</h2>
                         <div className="space-y-6">
                             <div>
-                                <p className="text-2xl font-bold text-slate-400 mb-1">CDRRMO / EMS</p>
+                                <p className="text-2xl font-bold text-slate-400 mb-1">CDRRMD / EMS</p>
                                 <p className="text-5xl font-black text-white tracking-tighter">137-135</p>
                             </div>
                             <div>

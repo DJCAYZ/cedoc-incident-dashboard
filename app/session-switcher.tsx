@@ -4,11 +4,16 @@ import { useState } from "react";
 import { DashboardView } from "./dashboard-view";
 import { Session } from "./actions";
 import { RealTimeClock } from "./real-time-clock";
+import dynamic from "next/dynamic";
+import { Map as MapIcon, LayoutDashboard } from "lucide-react";
+
+const IncidentMap = dynamic(() => import("./incident-map").then(m => m.IncidentMap), { ssr: false });
 
 export function SessionSwitcher({ activeSessions }: { activeSessions: Session[] }) {
     // Default to the first active session
     const defaultSession = activeSessions[0];
     const [selectedSessionId, setSelectedSessionId] = useState<number>(defaultSession?.id || 0);
+    const [viewMode, setViewMode] = useState<"dashboard" | "map">("dashboard");
 
     const selectedSession = activeSessions.find(s => s.id === selectedSessionId) || defaultSession;
 
@@ -29,8 +34,20 @@ export function SessionSwitcher({ activeSessions }: { activeSessions: Session[] 
                     </p>
                 </div>
                 <div className="flex items-center gap-16">
-                    <div className="text-blue-100 font-mono text-5xl bg-slate-800/50 px-8 py-6 rounded-2xl border-2 border-slate-700/50 font-bold">
-                        <RealTimeClock />
+                    <div className="flex flex-col gap-4 items-end">
+                        <div className="text-blue-100 font-mono text-5xl bg-slate-800/50 px-8 py-6 rounded-2xl border-2 border-slate-700/50 font-bold">
+                            <RealTimeClock />
+                        </div>
+                        <button 
+                            onClick={() => setViewMode(v => v === "dashboard" ? "map" : "dashboard")}
+                            className="bg-slate-800 hover:bg-slate-700 text-white px-6 py-3 rounded-full font-bold text-lg border border-slate-600 shadow-xl transition-all flex items-center gap-2"
+                        >
+                            {viewMode === "dashboard" ? (
+                                <><MapIcon size={20} className="text-blue-400" /> Switch to Map View</>
+                            ) : (
+                                <><LayoutDashboard size={20} className="text-blue-400" /> Switch to Dashboard</>
+                            )}
+                        </button>
                     </div>
                 </div>
             </div>
@@ -50,7 +67,11 @@ export function SessionSwitcher({ activeSessions }: { activeSessions: Session[] 
             )}
             
             <div className="flex-1 overflow-hidden">
-                <DashboardView session={selectedSession} />
+                {viewMode === "dashboard" ? (
+                    <DashboardView session={selectedSession} />
+                ) : (
+                    <IncidentMap session={selectedSession} />
+                )}
             </div>
         </div>
     );

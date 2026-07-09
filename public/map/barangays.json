@@ -1,0 +1,88 @@
+{
+  "barangays": [
+    {
+      "name": "Addition Hills",
+      "coordinates": [14.5940121, 121.0398547]
+    },
+    {
+      "name": "Balong-Bato",
+      "coordinates": [14.6079725, 121.0235903]
+    },
+    {
+      "name": "Batis",
+      "coordinates": [14.5991146, 121.0246460]
+    },
+    {
+      "name": "Corazon de Jesus",
+      "coordinates": [14.6066944, 121.0314810]
+    },
+    {
+      "name": "Ermitaño",
+      "coordinates": [14.6112771, 121.0311962]
+    },
+    {
+      "name": "Greenhills",
+      "coordinates": [14.6017667, 121.0468165]
+    },
+    {
+      "name": "Isabelita",
+      "coordinates": [14.6036915, 121.0306470]
+    },
+    {
+      "name": "Kabayanan",
+      "coordinates": [14.5978022, 121.0300802]
+    },
+    {
+      "name": "Little Baguio",
+      "coordinates": [14.6007073, 121.0382174]
+    },
+    {
+      "name": "Maytunas",
+      "coordinates": [14.5942824, 121.0315530]
+    },
+    {
+      "name": "Onse",
+      "coordinates": [14.6017402, 121.0314553]
+    },
+    {
+      "name": "Pasadena",
+      "coordinates": [14.6087274, 121.0332511]
+    },
+    {
+      "name": "Pedro Cruz",
+      "coordinates": [14.6047426, 121.0265108]
+    },
+    {
+      "name": "Progreso",
+      "coordinates": [14.6026556, 121.0198508]
+    },
+    {
+      "name": "Rivera",
+      "coordinates": [14.6052812, 121.0222201]
+    },
+    {
+      "name": "Saint Joseph",
+      "coordinates": [14.6030812, 121.0325182]
+    },
+    {
+      "name": "Salapan",
+      "coordinates": [14.6130408, 121.0247936]
+    },
+    {
+      "name": "San Perfecto",
+      "coordinates": [14.6035064, 121.0231261]
+    },
+    {
+      "name": "Santa Lucia",
+      "coordinates": [14.5978715, 121.0351643]
+    },
+    {
+      "name": "Tibagan",
+      "coordinates": [14.6007907, 121.0295877]
+    },
+    {
+      "name": "West Crame",
+      "coordinates": [14.6063099, 121.0502649]
+    }
+  ]
+}

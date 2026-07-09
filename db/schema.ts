@@ -1,5 +1,4 @@
-import { int, sqliteTable, text } from 'drizzle-orm/sqlite-core';
-
+import { int, sqliteTable, text, real } from 'drizzle-orm/sqlite-core';
 export const sessionsTable = sqliteTable("sessions", {
   id: int().primaryKey({ autoIncrement: true }),
   name: text().notNull(),
@@ -17,6 +16,8 @@ export const incidentsTable = sqliteTable("incidents", {
   severity: text().notNull().default('🟢 Normal'),
   location: text().notNull(),
   barangay: text().notNull().default('Unknown'),
+  latitude: real(),
+  longitude: real(),
   status: text().notNull().default('Reported'),
   responding_unit: text().notNull().default('None'),
   casualties_dead: int().notNull().default(0),

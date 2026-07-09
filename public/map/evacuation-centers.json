@@ -1,0 +1,375 @@
+{
+  "centers": [
+    {
+      "id": "evac_001",
+      "name": "Addition Hills Brgy. Hall",
+      "coordinates": [121.04211574518084, 14.594785252590643],
+      "type": "barangay_hall",
+      "capacity": "--"
+    },
+    {
+      "id": "evac_002",
+      "name": "San Juan Central Gym",
+      "coordinates": [121.02263269526384, 14.606584932406053],
+      "type": "gymnasium",
+      "capacity": "--"
+    },
+    {
+      "id": "evac_003",
+      "name": "Balong Bato Brgy. Hall",
+      "coordinates": [121.02353590008651, 14.608383851241314],
+      "type": "barangay_hall",
+      "capacity": "--"
+    },
+    {
+      "id": "evac_004",
+      "name": "Balong Bato Court",
+      "coordinates": [121.02356463097833, 14.608327552006685],
+      "type": "court",
+      "capacity": "--"
+    },
+    {
+      "id": "evac_005",
+      "name": "Balong Bato Day Care Center",
+      "coordinates": [121.02392636265779, 14.608522515453913],
+      "type": "daycare",
+      "capacity": "--"
+    },
+    {
+      "id": "evac_006",
+      "name": "Batis Covered Court",
+      "coordinates": [121.0251234493363, 14.598231885513075],
+      "type": "court",
+      "capacity": "--"
+    },
+    {
+      "id": "evac_007",
+      "name": "Batis Multi Purpose Hall",
+      "coordinates": [121.02440149248682, 14.599854925202433],
+      "type": "multipurpose",
+      "capacity": "--"
+    },
+    {
+      "id": "evac_008",
+      "name": "Batis Brgy. Hall",
+      "coordinates": [121.02462044020308, 14.599138960975116],
+      "type": "barangay_hall",
+      "capacity": "--"
+    },
+    {
+      "id": "evac_009",
+      "name": "Pinaglabanan Elem. School",
+      "coordinates": [121.02987871196504, 14.604002596374897],
+      "type": "school",
+      "capacity": "--"
+    },
+    {
+      "id": "evac_010",
+      "name": "San Juan National H.S.",
+      "coordinates": [121.02942348134778, 14.605174348366328],
+      "type": "school",
+      "capacity": "--"
+    },
+    {
+      "id": "evac_011",
+      "name": "Corazon de Jesus Day Care Center",
+      "coordinates": [121.02938333894241, 14.602114800608303],
+      "type": "daycare",
+      "capacity": "--"
+    },
+    {
+      "id": "evac_012",
+      "name": "C.D.J. Court",
+      "coordinates": [121.03161808209693, 14.606685532933593],
+      "type": "court",
+      "capacity": "--"
+    },
+    {
+      "id": "evac_013",
+      "name": "St. John the Baptist Parish",
+      "coordinates": [121.02822030376478, 14.605048492715547],
+      "type": "church",
+      "capacity": "--"
+    },
+    {
+      "id": "evac_014",
+      "name": "Pinaglabanan Elem. School",
+      "coordinates": [121.02968522723614, 14.604649452575],
+      "type": "school",
+      "capacity": "--"
+    },
+    {
+      "id": "evac_015",
+      "name": "Ermitaño Covered Court",
+      "coordinates": [121.02958960533297, 14.613017244294578],
+      "type": "court",
+      "capacity": "--"
+    },
+    {
+      "id": "evac_016",
+      "name": "Mary the Queen Parish",
+      "coordinates": [121.04220236402007, 14.603792879839197],
+      "type": "church",
+      "capacity": "--"
+    },
+    {
+      "id": "evac_017",
+      "name": "St. Joseph Multi Purpose Hall",
+      "coordinates": [121.03200731145903, 14.602728105078931],
+      "type": "multipurpose",
+      "capacity": "--"
+    },
+    {
+      "id": "evac_018",
+      "name": "St. Joseph Day Care Center",
+      "coordinates": [121.03208255436151, 14.604180869759034],
+      "type": "daycare",
+      "capacity": "--"
+    },
+    {
+      "id": "evac_019",
+      "name": "Nicanor Ibuna St.",
+      "coordinates": [121.03004358708856, 14.601791857565381],
+      "type": "street",
+      "capacity": "--"
+    },
+    {
+      "id": "evac_020",
+      "name": "Kabayanan Elem. School",
+      "coordinates": [121.03198596475225, 14.598605391725194],
+      "type": "school",
+      "capacity": "--"
+    },
+    {
+      "id": "evac_021",
+      "name": "Kabayanan Day Care Center",
+      "coordinates": [121.02972661059289, 14.597948948043035],
+      "type": "daycare",
+      "capacity": "--"
+    },
+    {
+      "id": "evac_022",
+      "name": "Kabayanan Brgy. Hall",
+      "coordinates": [121.02988979266415, 14.597822616601844],
+      "type": "barangay_hall",
+      "capacity": "--"
+    },
+    {
+      "id": "evac_023",
+      "name": "Sanctuario de Sto. Cristo",
+      "coordinates": [121.03061762044312, 14.598360806239606],
+      "type": "church",
+      "capacity": "--"
+    },
+    {
+      "id": "evac_024",
+      "name": "Little Baguio Covered Court",
+      "coordinates": [121.03786735515479, 14.606165445022112],
+      "type": "court",
+      "capacity": "--"
+    },
+    {
+      "id": "evac_025",
+      "name": "Little Baguio Day Care",
+      "coordinates": [121.03823823742943, 14.60341029618864],
+      "type": "daycare",
+      "capacity": "--"
+    },
+    {
+      "id": "evac_026",
+      "name": "Maytunas Day Care Center",
+      "coordinates": [121.0315572057951, 14.594304557749695],
+      "type": "daycare",
+      "capacity": "--"
+    },
+    {
+      "id": "evac_027",
+      "name": "Onse Covered Court",
+      "coordinates": [121.03113251980892, 14.601613087118674],
+      "type": "court",
+      "capacity": "--"
+    },
+    {
+      "id": "evac_028",
+      "name": "Onse Day Care Center",
+      "coordinates": [121.02907428000309, 14.601983436567096],
+      "type": "daycare",
+      "capacity": "--"
+    },
+    {
+      "id": "evac_029",
+      "name": "Pasadena Covered Court",
+      "coordinates": [121.03396437130077, 14.609078638935141],
+      "type": "court",
+      "capacity": "--"
+    },
+    {
+      "id": "evac_030",
+      "name": "Pasadena Learning Center",
+      "coordinates": [121.03536317914774, 14.608449853261966],
+      "type": "learning_center",
+      "capacity": "--"
+    },
+    {
+      "id": "evac_031",
+      "name": "Pedro Cruz Elem. School",
+      "coordinates": [121.02631159159608, 14.605529152659539],
+      "type": "school",
+      "capacity": "--"
+    },
+    {
+      "id": "evac_032",
+      "name": "Pedro Cruz Covered Court",
+      "coordinates": [121.02376395421575, 14.605081963292761],
+      "type": "court",
+      "capacity": "--"
+    },
+    {
+      "id": "evac_033",
+      "name": "Pedro Cruz Day Care Center",
+      "coordinates": [121.02726998838541, 14.602431433437928],
+      "type": "daycare",
+      "capacity": "--"
+    },
+    {
+      "id": "evac_034",
+      "name": "Progreso Covered Court",
+      "coordinates": [121.01986680163382, 14.60325226523095],
+      "type": "court",
+      "capacity": "--"
+    },
+    {
+      "id": "evac_035",
+      "name": "Progreso Day Care Center",
+      "coordinates": [121.02014526311845, 14.603170898694668],
+      "type": "daycare",
+      "capacity": "--"
+    },
+    {
+      "id": "evac_036",
+      "name": "Rivera Day Care Center",
+      "coordinates": [121.02080027139729, 14.60495739338407],
+      "type": "daycare",
+      "capacity": "--"
+    },
+    {
+      "id": "evac_037",
+      "name": "Rivera Covered Court",
+      "coordinates": [121.02157043825754, 14.605836290156857],
+      "type": "court",
+      "capacity": "--"
+    },
+    {
+      "id": "evac_038",
+      "name": "Salapan Brgy. Hall",
+      "coordinates": [121.02480084345073, 14.61301266851955],
+      "type": "barangay_hall",
+      "capacity": "--"
+    },
+    {
+      "id": "evac_039",
+      "name": "Salapan Day Care Center",
+      "coordinates": [121.02479501766935, 14.6130639796774],
+      "type": "daycare",
+      "capacity": "--"
+    },
+    {
+      "id": "evac_040",
+      "name": "Salapan Elem. School",
+      "coordinates": [121.02445472998153, 14.611324956092918],
+      "type": "school",
+      "capacity": "--"
+    },
+    {
+      "id": "evac_041",
+      "name": "Salapan Covered Court",
+      "coordinates": [121.02405366438772, 14.60714432586359],
+      "type": "court",
+      "capacity": "--"
+    },
+    {
+      "id": "evac_042",
+      "name": "Salapan Health Center",
+      "coordinates": [121.02479501766935, 14.6130639796774],
+      "type": "health_center",
+      "capacity": "--"
+    },
+    {
+      "id": "evac_043",
+      "name": "San Perfecto Brgy. Hall",
+      "coordinates": [121.02148788338042, 14.602807310402508],
+      "type": "barangay_hall",
+      "capacity": "--"
+    },
+    {
+      "id": "evac_044",
+      "name": "San Perfecto Day Care Center",
+      "coordinates": [121.02230352819056, 14.602976726718623],
+      "type": "daycare",
+      "capacity": "--"
+    },
+    {
+      "id": "evac_045",
+      "name": "San Perfecto Elem. School",
+      "coordinates": [121.02319500808545, 14.603125832270576],
+      "type": "school",
+      "capacity": "--"
+    },
+    {
+      "id": "evac_046",
+      "name": "Sta. Lucia Court",
+      "coordinates": [121.02991822374932, 14.596912121008259],
+      "type": "court",
+      "capacity": "--"
+    },
+    {
+      "id": "evac_047",
+      "name": "Sta. Lucia Day Care Center",
+      "coordinates": [121.03552767063115, 14.598015896459078],
+      "type": "daycare",
+      "capacity": "--"
+    },
+    {
+      "id": "evac_048",
+      "name": "Tibagan Day Care Center",
+      "coordinates": [121.0297052576274, 14.601052979254028],
+      "type": "daycare",
+      "capacity": "--"
+    },
+    {
+      "id": "evac_049",
+      "name": "Tibagan Court",
+      "coordinates": [121.02988780201734, 14.601287076677481],
+      "type": "court",
+      "capacity": "--"
+    },
+    {
+      "id": "evac_050",
+      "name": "West Crame Covered Court",
+      "coordinates": [121.05079185943265, 14.604922595976285],
+      "type": "court",
+      "capacity": "--"
+    },
+    {
+      "id": "evac_051",
+      "name": "West Crame Bible Church",
+      "coordinates": [121.05048630339623, 14.607410683358045],
+      "type": "church",
+      "capacity": "--"
+    },
+    {
+      "id": "evac_052",
+      "name": "West Crame Day Care Center",
+      "coordinates": [121.05049863414558, 14.605838214725456],
+      "type": "daycare",
+      "capacity": "--"
+    },
+    {
+      "id": "evac_053",
+      "name": "Sacred Heart Chapel",
+      "coordinates": [121.04881013967977, 14.60837060241208],
+      "type": "church",
+      "capacity": "--"
+    }
+  ]
+}

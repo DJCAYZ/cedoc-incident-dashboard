@@ -14,8 +14,140 @@ import {
     Info,
     ShieldAlert,
     ChevronDown,
-    Activity
+    Activity,
+    Map,
+    Sun,
+    Moon
 } from "lucide-react";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+import { useRef } from "react";
+import sanjuanGeoRaw from "../../public/map/sanjuan.json";
+
+function LocationPickerMap({ lat, lng, onChange, onClose }: { lat: number | null, lng: number | null, onChange: (lat: number, lng: number) => void, onClose: () => void }) {
+    const mapRef = useRef<HTMLDivElement>(null);
+    const leafletMap = useRef<L.Map | null>(null);
+    const marker = useRef<L.Marker | null>(null);
+    const tempCoords = useRef<{ lat: number, lng: number } | null>(null);
+    const tileLayerRef = useRef<L.TileLayer | null>(null);
+    const [mapTheme, setMapTheme] = useState<'dark' | 'light'>('light');
+
+    useEffect(() => {
+        if (tileLayerRef.current) {
+            tileLayerRef.current.setUrl(`https://{s}.basemaps.cartocdn.com/${mapTheme}_all/{z}/{x}/{y}{r}.png`);
+        }
+    }, [mapTheme]);
+
+    useEffect(() => {
+        if (!mapRef.current) return;
+        
+        // Default to San Juan City center
+        const defaultLat = 14.6041;
+        const defaultLng = 121.0315;
+
+        leafletMap.current = L.map(mapRef.current).setView(
+            [lat ?? defaultLat, lng ?? defaultLng], 
+            15
+        );
+
+        tileLayerRef.current = L.tileLayer(`https://{s}.basemaps.cartocdn.com/${mapTheme}_all/{z}/{x}/{y}{r}.png`, {
+            maxZoom: 19,
+        }).addTo(leafletMap.current);
+
+        // Fix leaflet default icon issue without images
+        delete (L.Icon.Default.prototype as any)._getIconUrl;
+        L.Icon.Default.mergeOptions({
+            iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+            iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+            shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+        });
+
+        // Add San Juan Boundary Layer
+        L.geoJSON(sanjuanGeoRaw as any, {
+            filter: (feature) => feature?.geometry?.type === "Polygon" || feature?.geometry?.type === "MultiPolygon",
+            style: {
+                color: "#475569",
+                weight: 1.5,
+                opacity: 0.6,
+                fillColor: "#0f172a",
+                fillOpacity: 0.3
+            },
+            onEachFeature: (feature, layer) => {
+                const name = feature?.properties?.name;
+                if (name) {
+                    layer.bindTooltip(
+                        `<div style="font-family: 'Inter', sans-serif; font-weight: 600; font-size: 11px; padding: 4px 10px; border-radius: 20px; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.1); color: #f8fafc; box-shadow: 0 4px 12px rgba(0,0,0,0.1); text-align: center;">${name}</div>`,
+                        { direction: "center", permanent: true, opacity: 1, className: "bg-transparent border-none shadow-none p-0" }
+                    );
+                }
+            }
+        }).addTo(leafletMap.current);
+
+        if (lat !== null && lng !== null) {
+            marker.current = L.marker([lat, lng]).addTo(leafletMap.current);
+            tempCoords.current = { lat, lng };
+        }
+
+        leafletMap.current.on('click', (e) => {
+            const { lat: clickLat, lng: clickLng } = e.latlng;
+            tempCoords.current = { lat: clickLat, lng: clickLng };
+            if (marker.current) {
+                marker.current.setLatLng([clickLat, clickLng]);
+            } else {
+                marker.current = L.marker([clickLat, clickLng]).addTo(leafletMap.current!);
+            }
+        });
+
+        // Trigger resize when modal opens to ensure tiles load correctly
+        setTimeout(() => {
+            leafletMap.current?.invalidateSize();
+        }, 100);
+
+        return () => {
+            if (leafletMap.current) {
+                leafletMap.current.remove();
+            }
+        };
+    }, []);
+
+    const handleConfirm = () => {
+        if (tempCoords.current) {
+            onChange(tempCoords.current.lat, tempCoords.current.lng);
+        }
+        onClose();
+    };
+
+    return (
+        <div className="fixed inset-0 z-[9999] bg-slate-950/90 backdrop-blur-sm flex items-center justify-center p-4">
+            <div className="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-4xl h-[60vh] flex flex-col shadow-2xl overflow-hidden shadow-black/50">
+                <div className="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-950">
+                    <div>
+                        <h3 className="text-white font-bold tracking-wide flex items-center gap-2"><Map size={18} className="text-blue-500" /> Pinpoint Exact Location</h3>
+                        <p className="text-slate-400 text-xs mt-1">Click anywhere on the map to drop a pin. San Juan boundaries are outlined in grey.</p>
+                    </div>
+                    <Button variant="ghost" className="text-slate-400 hover:text-white" onClick={onClose}>✕</Button>
+                </div>
+                <div className="flex-1 relative bg-slate-800">
+                    <div ref={mapRef} className="absolute inset-0 z-0" />
+                    <div className="absolute top-4 right-4 z-[1000] bg-slate-900/90 backdrop-blur-md border border-slate-700 rounded-xl p-1.5 shadow-2xl flex gap-1 pointer-events-auto">
+                        <button
+                            type="button"
+                            onClick={() => setMapTheme(mapTheme === 'dark' ? 'light' : 'dark')}
+                            className="px-3 py-1.5 flex items-center justify-center rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-all cursor-pointer"
+                            title="Toggle Map Theme"
+                        >
+                            {mapTheme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+                        </button>
+                    </div>
+                </div>
+                <div className="p-4 border-t border-slate-800 bg-slate-950 flex items-center justify-end gap-3">
+                    <Button type="button" variant="ghost" className="text-slate-300 hover:text-white" onClick={onClose}>Cancel</Button>
+                    <Button type="button" className="bg-blue-600 hover:bg-blue-500 text-white px-6 font-semibold shadow-lg shadow-blue-500/20" onClick={handleConfirm}>Confirm Location</Button>
+                </div>
+            </div>
+        </div>
+    );
+}
 
 const incidentTypes = [
     "Medical Case", "Trauma", "Heat Exhaustion", "Slips and Falls",
@@ -26,7 +158,7 @@ const incidentTypes = [
 
 const severities = ["🔴 Critical", "🟠 High", "🟡 Moderate", "🟢 Normal"];
 const statuses = ["Reported", "Validated", "Response Ongoing", "Monitoring"];
-const respondingUnits = ["None", "BFP", "PNP", "EMS", "CDRRMO"];
+const respondingUnits = ["None", "BFP", "PNP", "EMS", "CDRRMD"];
 
 const barangays = [
     // District 1
@@ -54,14 +186,7 @@ const barangays = [
     { name: "West Crame", district: 2 }
 ];
 
-const corazonDeJesusStreets = [
-    "A. Lake Street", "Attorney A. Mendoza Street", "Benavidez Street",
-    "Callejon Victoria", "Captain Manzano Street", "Corazon de Jesus Street",
-    "F. Roman Street", "H. Lozada Street", "J. Ruiz Street",
-    "Lactao Street", "Lope K. Santos Street", "N. Domingo Street",
-    "P. Grande Street", "Pancho Villa Street", "Paraiso Street", "Pinaglabanan Street",
-    "R. Lagmay Street", "S. Guzman Street"
-];
+import streetsData from "../../public/map/streets.json";
 
 export function IncidentForm({ activeSessions, activeIncidents }: { activeSessions: Session[], activeIncidents?: Incident[] }) {
     const router = useRouter();
@@ -78,6 +203,7 @@ export function IncidentForm({ activeSessions, activeIncidents }: { activeSessio
     const [barangay, setBarangay] = useState("");
     const [street, setStreet] = useState("");
     const [isBarangayFocused, setIsBarangayFocused] = useState(false);
+    const [isStreetFocused, setIsStreetFocused] = useState(false);
     const [respondingUnit, setRespondingUnit] = useState(respondingUnits[0]);
     const [casualtiesDead, setCasualtiesDead] = useState<number | "">(0);
     const [casualtiesInjured, setCasualtiesInjured] = useState<number | "">(0);
@@ -85,20 +211,23 @@ export function IncidentForm({ activeSessions, activeIncidents }: { activeSessio
     const [evacuatedFamilies, setEvacuatedFamilies] = useState<number | "">(0);
     const [evacuatedIndividuals, setEvacuatedIndividuals] = useState<number | "">(0);
     const [details, setDetails] = useState("");
+    const [exactLat, setExactLat] = useState<number | null>(null);
+    const [exactLng, setExactLng] = useState<number | null>(null);
+    const [showMapPicker, setShowMapPicker] = useState(false);
 
     // Populate form if in edit mode
     useEffect(() => {
         if (editId && activeIncidents) {
             const incident = activeIncidents.find(i => i.id === Number(editId));
             if (incident) {
-                setSessionId(incident.session_id);
+                setSessionId(incident.session_id ?? "");
                 setName(incident.name);
                 setType(incident.type);
                 setSeverity(incident.severity);
                 setStatus(incident.status);
                 setBarangay(incident.barangay);
 
-                if (incident.barangay === "Corazon de Jesus" && incident.location.includes(",")) {
+                if (incident.location.includes(",")) {
                     const parts = incident.location.split(",");
                     setStreet(parts[0].trim());
                     setLocation(parts.slice(1).join(",").trim());
@@ -116,6 +245,8 @@ export function IncidentForm({ activeSessions, activeIncidents }: { activeSessio
                 setEvacuatedFamilies(incident.evacuated_families);
                 setEvacuatedIndividuals(incident.evacuated_individuals);
                 setDetails(incident.details || "");
+                setExactLat(incident.latitude || null);
+                setExactLng(incident.longitude || null);
 
                 const d = new Date(incident.created_at);
                 d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
@@ -140,6 +271,9 @@ export function IncidentForm({ activeSessions, activeIncidents }: { activeSessio
             setEvacuatedFamilies(0);
             setEvacuatedIndividuals(0);
             setDetails("");
+            setExactLat(null);
+            setExactLng(null);
+            setShowMapPicker(false);
         }
     }, [editId, activeIncidents, activeSessions]);
 
@@ -234,6 +368,8 @@ export function IncidentForm({ activeSessions, activeIncidents }: { activeSessio
             evacuated_families: Number(evacuatedFamilies || 0),
             evacuated_individuals: Number(evacuatedIndividuals || 0),
             details: details,
+            latitude: exactLat,
+            longitude: exactLng,
             created_at: timestamp
         };
 
@@ -417,6 +553,7 @@ export function IncidentForm({ activeSessions, activeIncidents }: { activeSessio
                         </div>
 
                         {/* Location Details */}
+
                         <div className="flex flex-col gap-1.5 md:col-span-2">
                             <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
                                 <MapPin size={12} className="text-blue-400" />
@@ -463,7 +600,7 @@ export function IncidentForm({ activeSessions, activeIncidents }: { activeSessio
                                                 {districtBarangays.map(b => (
                                                     <div
                                                         key={b.name}
-                                                        onMouseDown={() => setBarangay(b.name)}
+                                                        onMouseDown={() => { setBarangay(b.name); setStreet(""); }}
                                                         className="px-4 py-2 hover:bg-blue-600/20 cursor-pointer text-sm text-slate-300 transition-all flex items-center justify-between"
                                                     >
                                                         <span>{b.name}</span>
@@ -484,23 +621,99 @@ export function IncidentForm({ activeSessions, activeIncidents }: { activeSessio
                             )}
                         </div>
 
-                        {/* Street Select for Corazon de Jesus */}
-                        {barangay === "Corazon de Jesus" && (
-                            <div className="flex flex-col gap-1.5 md:col-span-2">
+                        {/* Street Autocomplete for all Barangays */}
+                        {isValidBarangay && barangay !== "" && (
+                            <div className="flex flex-col gap-1.5 relative md:col-span-2">
                                 <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
                                     <MapPin size={12} className="text-blue-400" />
-                                    <span>Specific Street (Corazon de Jesus)</span>
+                                    <span>Specific Street (Optional)</span>
                                 </label>
-                                <select
+                                <input
+                                    type="text"
                                     value={street}
                                     onChange={(e) => setStreet(e.target.value)}
-                                    className="bg-slate-950 border border-slate-800 text-slate-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-600 focus:border-blue-500 focus:outline-none transition-all cursor-pointer"
-                                >
-                                    <option value="">Select street...</option>
-                                    {corazonDeJesusStreets.map(s => <option key={s} value={s}>{s}</option>)}
-                                </select>
+                                    onFocus={() => setIsStreetFocused(true)}
+                                    onBlur={() => setTimeout(() => setIsStreetFocused(false), 200)}
+                                    className="bg-slate-950 border border-slate-800 text-white rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-600 focus:border-blue-500 focus:outline-none transition-all placeholder-slate-600 w-full"
+                                    placeholder="Type to search or enter custom street..."
+                                    autoComplete="off"
+                                />
+                                {isStreetFocused && streetsData[barangay as keyof typeof streetsData] && (
+                                    <div className="absolute z-50 left-0 right-0 top-[calc(100%+6px)] max-h-56 overflow-y-auto bg-slate-900 border border-slate-800 rounded-xl shadow-2xl py-1">
+                                        {['major', 'minor'].map(type => {
+                                            const typeStreets = (streetsData[barangay as keyof typeof streetsData] as any)[type];
+                                            if (!typeStreets) return null;
+                                            const filteredStreets = typeStreets.filter((s: any) => s.name.toLowerCase().includes(street.toLowerCase()));
+                                            if (filteredStreets.length === 0) return null;
+                                            return (
+                                                <div key={type}>
+                                                    <div className="px-3 py-1.5 text-[9px] font-bold text-slate-500 bg-slate-950 border-b border-slate-800/80 uppercase tracking-widest sticky top-0 capitalize">
+                                                        {type} Streets
+                                                    </div>
+                                                    {filteredStreets.map((s: any) => (
+                                                        <div
+                                                            key={s.name}
+                                                            onMouseDown={() => setStreet(s.name)}
+                                                            className="px-4 py-2 hover:bg-blue-600/20 cursor-pointer text-sm text-slate-300 transition-all flex items-center justify-between"
+                                                        >
+                                                            <span>{s.name}</span>
+                                                            {street.toLowerCase() === s.name.toLowerCase() && (
+                                                                <span className="text-blue-400 text-xs">✓</span>
+                                                            )}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            );
+                                        })}
+                                        {['major', 'minor'].every(type => {
+                                            const t = (streetsData[barangay as keyof typeof streetsData] as any)?.[type];
+                                            return !t || t.filter((s: any) => s.name.toLowerCase().includes(street.toLowerCase())).length === 0;
+                                        }) && (
+                                            <div className="px-4 py-3 text-sm text-slate-500 italic text-center">
+                                                No specific street match. Custom entry allowed.
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
                             </div>
                         )}
+
+                        {/* Map Pinpoint */}
+                        <div className="flex flex-col gap-1.5 md:col-span-2">
+                            <div className="flex items-center justify-between">
+                                <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                                    <Map size={12} className="text-blue-400" />
+                                    <span>Exact Map Location (Optional)</span>
+                                </label>
+                                {exactLat !== null && exactLng !== null && (
+                                    <button 
+                                        type="button" 
+                                        onClick={() => { setExactLat(null); setExactLng(null); }}
+                                        className="text-[10px] text-rose-400 hover:text-rose-300 font-bold tracking-wider"
+                                    >
+                                        CLEAR PIN
+                                    </button>
+                                )}
+                            </div>
+                            
+                            {!showMapPicker ? (
+                                <button
+                                    type="button"
+                                    onClick={() => setShowMapPicker(true)}
+                                    className={`w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-dashed transition-all text-sm font-semibold ${exactLat !== null ? "bg-blue-600/10 border-blue-500/50 text-blue-400" : "bg-slate-950 border-slate-700 text-slate-400 hover:bg-slate-900 hover:text-slate-300"}`}
+                                >
+                                    <MapPin size={16} />
+                                    {exactLat !== null && exactLng !== null ? `Pinned: ${exactLat.toFixed(5)}, ${exactLng.toFixed(5)}` : "Pinpoint on Map"}
+                                </button>
+                            ) : (
+                                <LocationPickerMap 
+                                    lat={exactLat} 
+                                    lng={exactLng} 
+                                    onChange={(lat, lng) => { setExactLat(lat); setExactLng(lng); }} 
+                                    onClose={() => setShowMapPicker(false)} 
+                                />
+                            )}
+                        </div>
 
                         {/* Timestamp */}
                         <div className="flex flex-col gap-1.5 md:col-span-2">
@@ -516,6 +729,7 @@ export function IncidentForm({ activeSessions, activeIncidents }: { activeSessio
                                 className="bg-slate-950 border border-slate-800 text-white rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-600 focus:border-blue-500 focus:outline-none transition-all cursor-text"
                             />
                         </div>
+
 
                         {/* Incident Logs/Logs Description */}
                         <div className="flex flex-col gap-1.5 md:col-span-2">
