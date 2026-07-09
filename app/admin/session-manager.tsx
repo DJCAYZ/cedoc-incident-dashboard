@@ -3,13 +3,15 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { createEventSession, closeSession, Session } from "../actions";
-import { Activity, ShieldAlert, Plus } from "lucide-react";
+import { createEventSession, closeSession, updateSessionName, Session } from "../actions";
+import { Activity, ShieldAlert, Plus, Edit2, Check, X } from "lucide-react";
 
 export function SessionManager({ activeSessions }: { activeSessions: Session[] }) {
     const router = useRouter();
     const [eventName, setEventName] = useState("");
     const [isCreating, setIsCreating] = useState(false);
+    const [editingSessionId, setEditingSessionId] = useState<number | null>(null);
+    const [editName, setEditName] = useState("");
 
     const handleCreate = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -34,6 +36,17 @@ export function SessionManager({ activeSessions }: { activeSessions: Session[] }
             } catch (error) {
                 console.error("Failed to close session", error);
             }
+        }
+    };
+
+    const handleUpdate = async (id: number) => {
+        if (!editName.trim()) return;
+        try {
+            await updateSessionName(id, editName.trim());
+            setEditingSessionId(null);
+            router.refresh();
+        } catch (error) {
+            console.error("Failed to update session name", error);
         }
     };
 
@@ -76,8 +89,30 @@ export function SessionManager({ activeSessions }: { activeSessions: Session[] }
                             <div className="flex items-center gap-3">
                                 <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping absolute"></div>
                                 <div className="w-2.5 h-2.5 rounded-full bg-emerald-500"></div>
-                                <div className="flex flex-col">
-                                    <span className="text-sm font-bold text-slate-100 tracking-wide">{session.name}</span>
+                                <div className="flex flex-col flex-1">
+                                    {editingSessionId === session.id ? (
+                                        <div className="flex items-center gap-2">
+                                            <input
+                                                type="text"
+                                                value={editName}
+                                                onChange={e => setEditName(e.target.value)}
+                                                className="bg-slate-900 border border-slate-700 rounded px-2 py-1 text-sm text-white focus:outline-none focus:border-blue-500 w-full"
+                                                autoFocus
+                                            />
+                                            <button onClick={() => handleUpdate(session.id)} className="text-emerald-400 hover:text-emerald-300 transition-colors"><Check size={16} /></button>
+                                            <button onClick={() => setEditingSessionId(null)} className="text-rose-400 hover:text-rose-300 transition-colors"><X size={16} /></button>
+                                        </div>
+                                    ) : (
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-sm font-bold text-slate-100 tracking-wide">{session.name}</span>
+                                            <button 
+                                                onClick={() => { setEditingSessionId(session.id); setEditName(session.name); }} 
+                                                className="text-slate-500 hover:text-blue-400 transition-colors cursor-pointer"
+                                            >
+                                                <Edit2 size={12} />
+                                            </button>
+                                        </div>
+                                    )}
                                     <span className="text-[10px] font-mono text-slate-500 mt-0.5">SESSION ID: #{session.id}</span>
                                 </div>
                             </div>

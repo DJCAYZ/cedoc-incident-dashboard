@@ -98,3 +98,12 @@ export const waterLevelsTable = sqliteTable("water_levels", {
   status: text().notNull().default('Normal'),
   updated_at: int().notNull(),
 });
+
+// Water level updates (history) — tracks all logged levels per water level entry
+export const waterLevelUpdatesTable = sqliteTable("water_level_updates", {
+  id: int().primaryKey({ autoIncrement: true }),
+  water_level_id: int().references(() => waterLevelsTable.id, { onDelete: 'cascade' }),
+  level_meters: real().notNull(),
+  status: text().notNull(),
+  updated_at: int().notNull(),
+});

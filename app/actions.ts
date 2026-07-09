@@ -10,6 +10,7 @@ import {
   floodedAreasTable,
   waterLevelsTable,
   floodedAreaUpdatesTable,
+  waterLevelUpdatesTable,
 } from "@/db/schema";
 import { drizzle } from "drizzle-orm/libsql";
 import { eq, desc, ne, and, gte, inArray } from "drizzle-orm";
@@ -30,6 +31,7 @@ export type FloodedArea = typeof floodedAreasTable.$inferSelect & {
 };
 export type WaterLevel = typeof waterLevelsTable.$inferSelect;
 export type FloodedAreaUpdate = typeof floodedAreaUpdatesTable.$inferSelect;
+export type WaterLevelUpdate = typeof waterLevelUpdatesTable.$inferSelect;
 
 function revalidateAll() {
   revalidatePath("/");
@@ -75,6 +77,14 @@ export async function closeSession(id: number) {
   await db
     .update(sessionsTable)
     .set({ status: "closed", closed_at: Date.now() })
+    .where(eq(sessionsTable.id, id));
+  revalidateAll();
+}
+
+export async function updateSessionName(id: number, name: string) {
+  await db
+    .update(sessionsTable)
+    .set({ name })
     .where(eq(sessionsTable.id, id));
   revalidateAll();
 }
@@ -403,20 +413,32 @@ export async function upsertWaterLevel(
     )
     .limit(1);
 
+  let waterLevelId;
+
   if (existing.length > 0) {
+    waterLevelId = existing[0].id;
     await db
       .update(waterLevelsTable)
       .set({ level_meters: levelMeters, status, updated_at: Date.now() })
-      .where(eq(waterLevelsTable.id, existing[0].id));
+      .where(eq(waterLevelsTable.id, waterLevelId));
   } else {
-    await db.insert(waterLevelsTable).values({
+    const inserted = await db.insert(waterLevelsTable).values({
       session_id: sessionId,
       waterway_name: waterwayName,
       level_meters: levelMeters,
       status,
       updated_at: Date.now(),
-    });
+    }).returning();
+    waterLevelId = inserted[0].id;
   }
+
+  await db.insert(waterLevelUpdatesTable).values({
+    water_level_id: waterLevelId,
+    level_meters: levelMeters,
+    status,
+    updated_at: Date.now(),
+  });
+
   revalidateAll();
 }
 
@@ -453,6 +475,16 @@ export async function getEventReportData(sessionId: number) {
   const floodedAreas = await getFloodedAreas(sessionId);
   const waterLevels = await getWaterLevels(sessionId);
 
+  const waterLevelIds = waterLevels.map(w => w.id);
+  const waterLevelUpdates = waterLevelIds.length > 0
+    ? await db.select().from(waterLevelUpdatesTable).where(inArray(waterLevelUpdatesTable.water_level_id, waterLevelIds)).orderBy(desc(waterLevelUpdatesTable.updated_at))
+    : [];
+
+  const floodedAreaIds = floodedAreas.map(f => f.id);
+  const floodedAreaUpdates = floodedAreaIds.length > 0 
+    ? await db.select().from(floodedAreaUpdatesTable).where(inArray(floodedAreaUpdatesTable.flooded_area_id, floodedAreaIds)).orderBy(desc(floodedAreaUpdatesTable.updated_at))
+    : [];
+
   return {
     session,
     incidents,
@@ -462,5 +494,7 @@ export async function getEventReportData(sessionId: number) {
     preparedness,
     floodedAreas,
     waterLevels,
+    floodedAreaUpdates,
+    waterLevelUpdates,
   };
 }
