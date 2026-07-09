@@ -83,7 +83,7 @@ export function IncidentMap({ session }: { session: Session }) {
     useEffect(() => {
         if (!mapRef.current || mapInstance.current) return;
 
-        const map = L.map(mapRef.current, { zoomControl: true }).setView([14.602, 121.035], 14);
+        const map = L.map(mapRef.current, { zoomControl: true }).setView([14.602, 121.035], 15);
         mapInstance.current = map;
 
         tileLayerRef.current = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
