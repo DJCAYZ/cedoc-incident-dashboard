@@ -293,12 +293,12 @@ export function ResourceForm({
         </Button>
       </div>
 
-      {/* ── WATER RESCUE EQUIPMENT SECTION ── */}
+      {/* ── RESCUE EQUIPMENT SECTION ── */}
       <div className="flex flex-col gap-4 bg-slate-900/40 backdrop-blur-md p-5 rounded-2xl border border-slate-800/80 shadow-2xl">
         <div className="flex justify-between items-center border-b border-slate-800 pb-2.5">
           <h2 className="text-base font-bold text-white flex items-center gap-2">
             <Anchor size={18} className="text-cyan-400" />
-            <span>Water Rescue Equipment</span>
+            <span>Rescue Equipment</span>
           </h2>
           {equipMsg && (
             <span className="text-xs bg-emerald-500/10 text-emerald-400 px-2.5 py-0.5 rounded-full font-bold border border-emerald-500/20 animate-pulse">

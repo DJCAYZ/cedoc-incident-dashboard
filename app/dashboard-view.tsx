@@ -95,11 +95,13 @@ export function DashboardView({ session }: { session: Session }) {
     const [vehiclePage, setVehiclePage] = useState(1);
     const [preparednessPage, setPreparednessPage] = useState(1);
     const [incidentPage, setIncidentPage] = useState(1);
+    const [equipmentPage, setEquipmentPage] = useState(1);
 
     const personnelPerPage = 5;
     const vehiclePerPage = 5;
     const preparednessPerPage = 3;
     const incidentPerPage = 8;
+    const equipmentPerPage = 10;
 
     const { data: incidents = [] } = useQuery({
         queryKey: ['incidents', 'session', sessionId],
@@ -416,7 +418,7 @@ export function DashboardView({ session }: { session: Session }) {
                         <PaginationBar currentPage={vehiclePage} totalItems={vehicles.length} itemsPerPage={vehiclePerPage} onPageChange={setVehiclePage} />
                     </div>
 
-                    {/* Water Rescue Equipment */}
+                    {/* Rescue Equipment */}
                     <div className="bg-slate-800/80 p-6 rounded-2xl border border-slate-600 shadow-xl shrink-0">
                         <h2 className="text-2xl font-bold mb-4 uppercase tracking-wider text-slate-300 border-b border-slate-600 pb-2 flex items-center gap-2">
                             <Anchor size={20} className="text-cyan-400" />
@@ -424,7 +426,7 @@ export function DashboardView({ session }: { session: Session }) {
                         </h2>
                         <div className="grid grid-cols-2 gap-3">
                             {equipment.length === 0 && <span className="text-slate-500 italic text-sm col-span-2">No equipment logged.</span>}
-                            {equipment.map(e => (
+                            {equipment.slice((equipmentPage - 1) * equipmentPerPage, equipmentPage * equipmentPerPage).map(e => (
                                 <div key={e.id} className="bg-slate-700/50 p-3.5 rounded-lg flex flex-col items-center justify-center text-center">
                                     <span className="text-sm font-bold text-slate-200 uppercase tracking-wider mb-2">{e.name}</span>
                                     <div className="flex items-center gap-4">
@@ -441,6 +443,7 @@ export function DashboardView({ session }: { session: Session }) {
                                 </div>
                             ))}
                         </div>
+                        <PaginationBar currentPage={equipmentPage} totalItems={equipment.length} itemsPerPage={equipmentPerPage} onPageChange={setEquipmentPage} />
                     </div>
 
                     <div className="bg-slate-800/80 p-6 rounded-2xl border border-slate-600 shadow-xl flex flex-col h-[400px] shrink-0">

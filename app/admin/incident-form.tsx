@@ -33,7 +33,7 @@ const incidentTypes = [
 
 const severities = ["🔴 Critical", "🟠 High", "🟡 Moderate", "🟢 Normal"];
 const statuses = ["Reported", "Validated", "Response Ongoing", "Monitoring"];
-const respondingUnits = ["None", "BFP", "PNP", "EMS", "CDRRMD", "TPMO", "POSO", "PID", "CHO"];
+const respondingUnits = ["None", "BFP", "PNP", "EMS", "CDRRMD", "TPMO", "POSO", "PID", "CHO", "CENRO", "GSD", "CSWDD", "CHD"];
 
 const barangays = [
     // District 1
@@ -79,7 +79,7 @@ export function IncidentForm({ activeSessions, activeIncidents }: { activeSessio
     const [street, setStreet] = useState("");
     const [isBarangayFocused, setIsBarangayFocused] = useState(false);
     const [isStreetFocused, setIsStreetFocused] = useState(false);
-    const [respondingUnit, setRespondingUnit] = useState(respondingUnits[0]);
+    const [respondingUnit, setRespondingUnit] = useState<string[]>([respondingUnits[0]]);
     const [casualtiesDead, setCasualtiesDead] = useState<number | "">(0);
     const [casualtiesInjured, setCasualtiesInjured] = useState<number | "">(0);
     const [casualtiesMissing, setCasualtiesMissing] = useState<number | "">(0);
@@ -114,7 +114,7 @@ export function IncidentForm({ activeSessions, activeIncidents }: { activeSessio
                     setLocation(incident.location);
                 }
 
-                setRespondingUnit(incident.responding_unit || respondingUnits[0]);
+                setRespondingUnit(incident.responding_unit ? incident.responding_unit.split(", ") : [respondingUnits[0]]);
                 setCallTaker(incident.call_taker);
                 setResponder(incident.responder);
                 setCasualtiesDead(incident.casualties_dead);
@@ -143,7 +143,7 @@ export function IncidentForm({ activeSessions, activeIncidents }: { activeSessio
             setStatus(statuses[0]);
             setBarangay("");
             setStreet("");
-            setRespondingUnit(respondingUnits[0]);
+            setRespondingUnit([respondingUnits[0]]);
             setCallTaker("");
             setResponder("");
             setCasualtiesDead(0);
@@ -244,7 +244,7 @@ export function IncidentForm({ activeSessions, activeIncidents }: { activeSessio
             severity,
             status,
             barangay: matchedBarangay.name,
-            responding_unit: respondingUnit,
+            responding_unit: respondingUnit.join(", "),
             call_taker: callTaker || "Unknown",
             responder: responder || "Unknown",
             casualties_dead: Number(casualtiesDead || 0),
@@ -279,7 +279,7 @@ export function IncidentForm({ activeSessions, activeIncidents }: { activeSessio
             setStatus(statuses[0]);
             setBarangay("");
             setStreet("");
-            setRespondingUnit(respondingUnits[0]);
+            setRespondingUnit([respondingUnits[0]]);
             setCallTaker("");
             setResponder("");
             setCasualtiesDead(0);
@@ -399,13 +399,33 @@ export function IncidentForm({ activeSessions, activeIncidents }: { activeSessio
                                 <Users size={12} className="text-blue-400" />
                                 <span>Responding Dispatch Agency</span>
                             </label>
-                            <select
-                                value={respondingUnit}
-                                onChange={(e) => setRespondingUnit(e.target.value)}
-                                className="bg-slate-950 border border-slate-800 text-slate-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-600 focus:border-blue-500 focus:outline-none transition-all cursor-pointer"
-                            >
-                                {respondingUnits.map(r => <option key={r} value={r}>{r}</option>)}
-                            </select>
+                            <div className="flex flex-col gap-2 max-h-48 overflow-y-auto bg-slate-950 border border-slate-800 rounded-xl p-3 scrollbar-thin scrollbar-thumb-slate-700">
+                                {respondingUnits.map(r => (
+                                    <label key={r} className="flex items-center gap-3 cursor-pointer text-slate-300 text-sm hover:text-white transition-colors">
+                                        <input
+                                            type="checkbox"
+                                            value={r}
+                                            checked={respondingUnit.includes(r)}
+                                            onChange={(e) => {
+                                                if (e.target.checked) {
+                                                    setRespondingUnit(prev => {
+                                                        if (r === "None") return ["None"];
+                                                        const updated = prev.filter(item => item !== "None");
+                                                        return [...updated, r];
+                                                    });
+                                                } else {
+                                                    setRespondingUnit(prev => {
+                                                        const updated = prev.filter(item => item !== r);
+                                                        return updated.length === 0 ? ["None"] : updated;
+                                                    });
+                                                }
+                                            }}
+                                            className="w-4 h-4 text-blue-600 bg-slate-900 border-slate-700 rounded focus:ring-blue-600 focus:ring-2 cursor-pointer"
+                                        />
+                                        {r}
+                                    </label>
+                                ))}
+                            </div>
                         </div>
 
                         {/* Call Taker */}
